@@ -19,7 +19,13 @@
 </script>
 
 <header class="flex w-full justify-between p-10">
-	<button class="corner bold text-4xl tracking-widest" on:click={() => clearInterval(interval)}>
+	<button
+		class="corner bold text-4xl tracking-widest"
+		on:click={() => {
+			clearInterval(interval);
+			character = '-';
+		}}
+	>
 		D<span class="inline-block w-7 text-center">{character}</span>ANA
 	</button>
 
