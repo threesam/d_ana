@@ -10,9 +10,7 @@
 		<slot />
 	</main>
 
-	<footer>
-		<p class="w-full border-t-2 border-pink-200 bg-black/70 p-5 text-center text-light">
-			© d-ana 1992-{new Date().getFullYear()}
-		</p>
+	<footer class="w-full border-t border-dark p-10 text-center text-dark">
+		© d-ana 1992-{new Date().getFullYear()}
 	</footer>
 </div>

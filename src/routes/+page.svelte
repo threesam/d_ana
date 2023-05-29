@@ -14,10 +14,10 @@
 	}}
 />
 
-<section class="grid grid-cols-1 gap-10 pb-10 lg:grid-cols-2 lg:gap-5">
+<section class="grid grid-cols-1 gap-10 pb-10 lg:grid-cols-2">
 	<img src={face} alt="d-ana's face" />
 	<div class="flex flex-col gap-5 text-xl">
-		<h1 class="text-5xl">I'm D</h1>
+		<h1 class="text-5xl">I'm D.</h1>
 		<p>
 			Irure irure sit nulla aliquip. Incididunt irure amet aute anim cillum laborum qui occaecat non
 			nisi ex veniam tempor nostrud. Ad incididunt consequat esse veniam laboris commodo amet

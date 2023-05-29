@@ -23,9 +23,7 @@
 		D<span class="inline-block w-7 text-center">{character}</span>ANA
 	</button>
 
-	<div class="corner">
-		<a href="https://tiktok.com/@d_ana___">
-			<TikTok />
-		</a>
-	</div>
+	<a href="https://tiktok.com/@d_ana___">
+		<TikTok color="#000" width={40} height={40} />
+	</a>
 </header>
