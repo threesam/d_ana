@@ -1,11 +1,18 @@
 <script>
 	import face from '$lib/assets/images/face.jpg';
+	import SEO from 'svelte-seo';
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
+<SEO
+	title="D-ANA"
+	description={'The skinny on D'}
+	openGraph={{
+		title: 'D-ANA',
+		description: 'The skinny on D',
+		type: 'website',
+		images: [{ url: face }]
+	}}
+/>
 
 <section class="grid grid-cols-1 gap-10 pb-10 lg:grid-cols-2 lg:gap-5">
 	<img src={face} alt="d-ana's face" />

@@ -2,7 +2,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import TikTok from './icons/TikTok.svelte';
 
-	let characters = ['I', '_', 'E', '—'];
+	let characters = ['I', '_', 'E', '-'];
 
 	$: index = 0;
 	$: character = '_';
