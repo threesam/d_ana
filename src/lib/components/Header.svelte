@@ -5,7 +5,7 @@
 	let characters = ['I', '_', 'E', '-'];
 
 	$: index = 0;
-	$: character = '_';
+	$: character = '-';
 
 	let interval;
 	onMount(() => {
