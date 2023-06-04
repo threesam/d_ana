@@ -1,12 +1,14 @@
 <script>
 	import Header from '../lib/components/Header.svelte';
 	import './styles.css';
+
+	export let data;
 </script>
 
 <div class="app min-h-screen font-sans">
 	<Header />
 
-	<main class="px-10">
+	<main>
 		<slot />
 	</main>
 

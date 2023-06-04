@@ -3,16 +3,21 @@ import { client } from '$lib/utils/sanity';
 // it so that it gets served as a static asset in production
 export const prerender = true;
 
-export async function load() {
-	const posts = await client.fetch(`*[_type == 'post']{
+export async function load({ params }) {
+	const post = await client.fetch(
+		`*[_type == 'post' && slug.current == $handle][0]{
 		...,
 		image{
 			...,
 			asset->
 		}
-	}`);
+	}`,
+		{
+			handle: params.handle
+		}
+	);
 
 	return {
-		posts
+		post
 	};
 }
