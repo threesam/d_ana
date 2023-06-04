@@ -3,8 +3,8 @@
 	import SEO from 'svelte-seo';
 
 	export let data;
-	console.log('data: ', data);
 	const { founder, title, description } = data.settings;
+	console.log('data: ', founder.imageGallery);
 </script>
 
 <SEO
@@ -24,6 +24,16 @@
 		<h1 class="text-5xl">I'm {founder?.name}.</h1>
 		<PortableText blocks={founder?.bio} />
 	</div>
+</section>
+
+<section class="grid grid-cols-2 gap-2 lg:grid-cols-4">
+	{#each founder.imageGallery as image}
+		<img
+			class="aspect-square h-full w-full object-cover"
+			src={image.url}
+			alt={image.originalFilename}
+		/>
+	{/each}
 </section>
 
 {#if data.posts}
