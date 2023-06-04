@@ -1,8 +1,17 @@
 <script>
 	import PortableText from '$lib/components/PortableText.svelte';
+	import SEO from 'svelte-seo';
 
 	export let data;
 </script>
+
+<SEO
+	title={data.post.title}
+	openGraph={{
+		title: data.post.title,
+		images: [{ url: data.post.image.asset.url }]
+	}}
+/>
 
 <section class="grid grid-cols-1 border-b border-dark lg:grid-cols-2">
 	<img src={data.post.image.asset.url} alt={data.post.title} />
