@@ -26,7 +26,7 @@
 	</div>
 </section>
 
-<section class="grid grid-cols-2 gap-2 lg:grid-cols-4">
+<section class="grid grid-cols-2 lg:grid-cols-4 lg:gap-2">
 	{#each founder.imageGallery as image}
 		<img
 			class="aspect-square h-full w-full object-cover"
