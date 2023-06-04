@@ -26,17 +26,19 @@
 	</div>
 </section>
 
-<section class="flex w-full flex-col px-5 py-10 lg:px-10">
-	<h2 class="mb-2 text-3xl">Thoughts</h2>
-	<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-2">
-		{#each data.posts as post}
-			<div class="mb-5">
-				<img src={post.image.asset.url} alt={post.title} />
-				<h3 class="">{post.title}</h3>
-				<a class="text-sm underline underline-offset-2" href={'/thoughts/' + post.slug.current}
-					>read more</a
-				>
-			</div>
-		{/each}
-	</div>
-</section>
+{#if data.posts}
+	<section class="flex w-full flex-col px-5 py-10 lg:px-10">
+		<h2 class="mb-2 text-3xl">Thoughts</h2>
+		<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-2">
+			{#each data.posts as post}
+				<div class="mb-5">
+					<img src={post.image.asset.url} alt={post.title} />
+					<h3 class="">{post.title}</h3>
+					<a class="text-sm underline underline-offset-2" href={'/thoughts/' + post.slug.current}
+						>read more</a
+					>
+				</div>
+			{/each}
+		</div>
+	</section>
+{/if}
