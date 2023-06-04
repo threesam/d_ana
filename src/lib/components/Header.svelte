@@ -18,16 +18,10 @@
 	onDestroy(() => clearInterval(interval));
 </script>
 
-<header class="flex w-full justify-between p-10">
-	<button
-		class="corner bold text-4xl tracking-widest"
-		on:click={() => {
-			clearInterval(interval);
-			character = '-';
-		}}
-	>
+<header class="flex w-full justify-between p-5 lg:p-10">
+	<a href="/" class="corner bold text-4xl tracking-widest">
 		D<span class="inline-block w-7 text-center">{character}</span>ANA
-	</button>
+	</a>
 
 	<a href="https://tiktok.com/@d_ana___">
 		<TikTok color="#000" width={40} height={40} />

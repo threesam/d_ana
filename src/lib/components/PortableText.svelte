@@ -1,6 +1,6 @@
 <script lang="ts">
-	export let blocks: any[] = []
-	import { PortableText } from '@portabletext/svelte'
+	export let blocks: any[] = [];
+	import { PortableText } from '@portabletext/svelte';
 </script>
 
 <section class="portable-text mx-auto max-w-4xl">
@@ -34,7 +34,7 @@
 			}
 
 			blockquote {
-				@apply text-dark border-2 border-black bg-pink-200 p-5 text-sm sm:p-10 md:text-lg;
+				@apply border-2 border-black bg-pink-200 p-5 text-sm text-dark sm:p-10 md:text-lg;
 			}
 		}
 	}
