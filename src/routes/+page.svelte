@@ -3,9 +3,30 @@
 	import SEO from 'svelte-seo'
 	import video from '$lib/assets/videos/sample.mp4'
 	import devVideo from '$lib/assets/videos/dev-sample.mp4'
+	import Play from '$lib/components/icons/Play.svelte'
+	import Pause from '$lib/components/icons/Pause.svelte'
 
 	export let data
 	const { founder, title, description } = data.settings
+
+	let isPaused: boolean = false
+
+	function play(node: HTMLVideoElement) {
+		if (!isPaused) {
+			node.play()
+		}
+	}
+
+	function handlePlayPauseClick() {
+		const videoElement = document.getElementById('hero-video') as HTMLVideoElement
+
+		isPaused = !isPaused
+		if (!isPaused) {
+			videoElement?.play()
+		} else {
+			videoElement?.pause()
+		}
+	}
 </script>
 
 <SEO
@@ -19,14 +40,28 @@
 	}}
 />
 
-<div class="aspect-video w-full pt-20 lg:px-10">
-	<video
-		class="w-full"
-		muted
-		loop
-		autoplay
-		src={process.env.NODE_ENV === 'development' ? devVideo : video}
-	></video>
+<div class="relative aspect-video w-full pt-20 lg:px-10">
+	<div class="group relative overflow-hidden">
+		<video
+			class="w-full"
+			muted
+			loop
+			autoplay
+			id="hero-video"
+			src={process.env.NODE_ENV === 'development' ? devVideo : video}
+			use:play
+		></video>
+		<button
+			class="absolute bottom-5 left-5 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+			on:click={handlePlayPauseClick}
+		>
+			{#if isPaused}
+				<Play width={50} height={50} />
+			{:else}
+				<Pause width={50} height={50} />
+			{/if}
+		</button>
+	</div>
 </div>
 
 <section class="grid grid-cols-2 py-10 lg:grid-cols-4 lg:gap-2 lg:px-10">
