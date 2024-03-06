@@ -4,7 +4,6 @@
 
 	export let data;
 	const { founder, title, description } = data.settings;
-	console.log('data: ', founder.imageGallery);
 </script>
 
 <SEO
