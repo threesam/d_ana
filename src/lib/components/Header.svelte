@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte'
+	import Instagram from './icons/Instagram.svelte'
 	import TikTok from './icons/TikTok.svelte'
 
 	let characters = ['I', '_', 'E', '-']
+	let scrollY = 0
 
 	$: index = 0
 	$: character = '-'
@@ -18,12 +20,21 @@
 	onDestroy(() => clearInterval(interval))
 </script>
 
-<header class="fixed bg-white/70 flex w-full justify-between p-5 lg:px-10">
+<svelte:window bind:scrollY />
+
+<header
+	class={`fixed flex w-full justify-between bg-white p-5 lg:px-10 ${scrollY > 0 ? 'border-b-2 border-black transition-all duration-150' : ''}`}
+>
 	<a href="/" class="corner bold text-4xl tracking-widest">
 		D<span class="inline-block w-7 text-center">{character}</span>ANA
 	</a>
 
-	<a href="https://tiktok.com/@d_ana___">
-		<TikTok color="#000" width={36} height={36} />
-	</a>
+	<div class="flex gap-5 [&>*]:overflow-hidden [&>*]:rounded-xl">
+		<a href="https://tiktok.com/@d_ana___">
+			<TikTok color="#000" width={40} height={40} />
+		</a>
+		<a href="https://www.instagram.com/__d_ana___">
+			<Instagram color="#000" width={40} height={40} />
+		</a>
+	</div>
 </header>

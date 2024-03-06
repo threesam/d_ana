@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import PortableText from '$lib/components/PortableText.svelte'
 	import SEO from 'svelte-seo'
 	import video from '$lib/assets/videos/sample.mp4'
@@ -20,14 +20,14 @@
 />
 
 <video
-	class="lg:px-10 pt-20"
+	class="pt-20 lg:px-10"
 	muted
 	loop
 	autoplay
 	src={process.env.NODE_ENV === 'development' ? devVideo : video}
 ></video>
 
-<section class="grid grid-cols-2 lg:grid-cols-4 py-10 lg:gap-2 lg:px-10">
+<section class="grid grid-cols-2 py-10 lg:grid-cols-4 lg:gap-2 lg:px-10">
 	{#each founder.imageGallery as image}
 		<img
 			class="aspect-square h-full w-full object-cover"
