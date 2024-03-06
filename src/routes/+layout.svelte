@@ -5,7 +5,7 @@
 	export let data;
 </script>
 
-<div class="app min-h-screen font-sans">
+<div class="app min-h-screen font-sans relative">
 	<Header />
 
 	<main>

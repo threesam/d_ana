@@ -1,6 +1,8 @@
 <script>
 	import PortableText from '$lib/components/PortableText.svelte';
 	import SEO from 'svelte-seo';
+	import video from '$lib/assets/videos/sample.mp4';
+	import devVideo from '$lib/assets/videos/dev-sample.mp4';
 
 	export let data;
 	const { founder, title, description } = data.settings;
@@ -17,15 +19,15 @@
 	}}
 />
 
-<section class="grid grid-cols-1 gap-10 px-5 pb-10 lg:grid-cols-2 lg:px-10">
-	<img src={founder.image.asset.url} alt="d-ana's face" />
-	<div class="flex flex-col gap-5 text-xl">
-		<h1 class="text-5xl">I'm {founder?.name}.</h1>
-		<PortableText blocks={founder?.bio} />
-	</div>
-</section>
+<video
+	class="lg:px-10 pt-20"
+	muted
+	loop
+	autoplay
+	src={process.env.NODE_ENV === 'development' ? devVideo : video}
+></video>
 
-<section class="grid grid-cols-2 lg:grid-cols-4 lg:gap-2">
+<section class="grid grid-cols-2 lg:grid-cols-4 py-10 lg:gap-2 lg:px-10">
 	{#each founder.imageGallery as image}
 		<img
 			class="aspect-square h-full w-full object-cover"
@@ -33,6 +35,14 @@
 			alt={image.originalFilename}
 		/>
 	{/each}
+</section>
+
+<section class="grid grid-cols-1 gap-10 px-5 lg:grid-cols-2 lg:px-10">
+	<img src={founder.image.asset.url} alt="d-ana's face" />
+	<div class="flex flex-col gap-5 text-xl">
+		<h1 class="text-5xl">I'm {founder?.name}.</h1>
+		<PortableText blocks={founder?.bio} />
+	</div>
 </section>
 
 {#if data.posts}
