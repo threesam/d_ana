@@ -41,7 +41,7 @@
 />
 
 <div class="relative aspect-video w-full pt-20 lg:px-10">
-	<div class="group relative overflow-hidden">
+	<div class="relative overflow-hidden">
 		<video
 			class="w-full"
 			muted
@@ -52,14 +52,16 @@
 			use:play
 		></video>
 		<button
-			class="absolute bottom-5 left-5 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+			class="absolute inset-0 text-white opacity-0 transition-opacity duration-300 hover:opacity-100"
 			on:click={handlePlayPauseClick}
 		>
-			{#if isPaused}
-				<Play width={50} height={50} />
-			{:else}
-				<Pause width={50} height={50} />
-			{/if}
+			<span class="absolute bottom-5 left-5 lg:bottom-10 lg:left-10">
+				{#if isPaused}
+					<Play width={50} height={50} />
+				{:else}
+					<Pause width={50} height={50} />
+				{/if}</span
+			>
 		</button>
 	</div>
 </div>
