@@ -34,7 +34,7 @@
 			}
 
 			blockquote {
-				@apply border-2 border-black bg-pink-200 p-5 text-sm text-dark sm:p-10 md:text-lg;
+				@apply text-dark border-2 border-black bg-pink-200 p-5 text-sm sm:p-10 md:text-lg;
 			}
 		}
 	}
