@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import TikTok from './icons/TikTok.svelte';
 
@@ -7,7 +7,7 @@
 	$: index = 0;
 	$: character = '-';
 
-	let interval;
+	let interval: number | undefined = undefined;
 	onMount(() => {
 		interval = setInterval(() => {
 			character = characters[index % characters.length];
