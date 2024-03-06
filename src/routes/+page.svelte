@@ -19,13 +19,15 @@
 	}}
 />
 
-<video
-	class="pt-20 lg:px-10"
-	muted
-	loop
-	autoplay
-	src={process.env.NODE_ENV === 'development' ? devVideo : video}
-></video>
+<div class="aspect-video w-full pt-20 lg:px-10">
+	<video
+		class="w-full"
+		muted
+		loop
+		autoplay
+		src={process.env.NODE_ENV === 'development' ? devVideo : video}
+	></video>
+</div>
 
 <section class="grid grid-cols-2 py-10 lg:grid-cols-4 lg:gap-2 lg:px-10">
 	{#each founder.imageGallery as image}
