@@ -1,8 +1,8 @@
 <script>
-	import PortableText from '$lib/components/PortableText.svelte';
-	import SEO from 'svelte-seo';
+	import PortableText from '$lib/components/PortableText.svelte'
+	import SEO from 'svelte-seo'
 
-	export let data;
+	export let data
 </script>
 
 <SEO

@@ -1,6 +1,6 @@
 <script lang="ts">
-	export let blocks: any[] = [];
-	import { PortableText } from '@portabletext/svelte';
+	export let blocks: any[] = []
+	import { PortableText } from '@portabletext/svelte'
 </script>
 
 <section class="portable-text mx-auto">

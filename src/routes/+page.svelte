@@ -1,11 +1,11 @@
 <script>
-	import PortableText from '$lib/components/PortableText.svelte';
-	import SEO from 'svelte-seo';
-	import video from '$lib/assets/videos/sample.mp4';
-	import devVideo from '$lib/assets/videos/dev-sample.mp4';
+	import PortableText from '$lib/components/PortableText.svelte'
+	import SEO from 'svelte-seo'
+	import video from '$lib/assets/videos/sample.mp4'
+	import devVideo from '$lib/assets/videos/dev-sample.mp4'
 
-	export let data;
-	const { founder, title, description } = data.settings;
+	export let data
+	const { founder, title, description } = data.settings
 </script>
 
 <SEO

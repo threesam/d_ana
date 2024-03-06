@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
-	import TikTok from './icons/TikTok.svelte';
+	import { onDestroy, onMount } from 'svelte'
+	import TikTok from './icons/TikTok.svelte'
 
-	let characters = ['I', '_', 'E', '-'];
+	let characters = ['I', '_', 'E', '-']
 
-	$: index = 0;
-	$: character = '-';
+	$: index = 0
+	$: character = '-'
 
-	let interval: number | undefined = undefined;
+	let interval: number | undefined = undefined
 	onMount(() => {
 		interval = setInterval(() => {
-			character = characters[index % characters.length];
-			index++;
-		}, 2000);
-	});
+			character = characters[index % characters.length]
+			index++
+		}, 2000)
+	})
 
-	onDestroy(() => clearInterval(interval));
+	onDestroy(() => clearInterval(interval))
 </script>
 
 <header class="fixed bg-white/70 flex w-full justify-between p-5 lg:px-10">
