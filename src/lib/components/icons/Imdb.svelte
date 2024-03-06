@@ -1,7 +1,7 @@
 <script>
 	export let width = 30
 	export let height = 30
-	export let color = '#000000'
+	export let color = 'currentColor'
 </script>
 
 <svg
@@ -10,7 +10,7 @@
 	{height}
 	viewBox="0 0 30 30"
 	fill={color}
-	class="transition duration-300 hover:text-primary"
+	class="hover:text-primary transition duration-300"
 >
 	<path
 		d="M17.7433 12.0617C17.6483 12.0083 17.4767 11.9817 17.2217 11.9817V17.885C17.5567 17.885

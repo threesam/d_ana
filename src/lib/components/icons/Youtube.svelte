@@ -1,7 +1,7 @@
 <script>
 	export let width = 30
 	export let height = 30
-	export let color = '#000000'
+	export let color = 'currentColor'
 </script>
 
 <svg
@@ -10,7 +10,7 @@
 	xmlns="http://www.w3.org/2000/svg"
 	{width}
 	{height}
-	class="transition duration-300 hover:text-primary"
+	class="hover:text-primary transition duration-300"
 >
 	<path d="M8.599 7.5L7 8.566V6.434L8.599 7.5z" fill="currentColor" />
 	<path
