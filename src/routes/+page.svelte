@@ -40,7 +40,7 @@
 	}}
 />
 
-<div class="relative aspect-video w-full pt-20 lg:px-10">
+<div class="relative aspect-video w-full pt-20 pb-32 lg:px-10">
 	<div class="relative overflow-hidden">
 		<video
 			class="w-full"
@@ -66,7 +66,7 @@
 	</div>
 </div>
 
-<section class="grid grid-cols-2 py-10 lg:grid-cols-4 lg:gap-2 lg:px-10">
+<section class="grid grid-cols-2 bg-gray-200 py-32 lg:grid-cols-4 lg:gap-10 lg:px-10">
 	{#each founder.imageGallery as image}
 		<img
 			class="aspect-square h-full w-full object-cover"
@@ -76,8 +76,8 @@
 	{/each}
 </section>
 
-<section class="grid grid-cols-1 gap-10 px-5 lg:grid-cols-2 lg:px-10">
-	<img src={founder.image.asset.url} alt="d-ana's face" />
+<section class="grid grid-cols-1 gap-10 py-32 px-5 lg:grid-cols-2 lg:px-10">
+	<img class="ring-2 ring-black" src={founder.image.asset.url} alt="d-ana's face" />
 	<div class="flex flex-col gap-5 text-xl">
 		<h1 class="text-5xl">I'm {founder?.name}.</h1>
 		<PortableText blocks={founder?.bio} />
@@ -85,12 +85,12 @@
 </section>
 
 {#if data.posts}
-	<section class="flex w-full flex-col px-5 py-10 lg:px-10">
+	<section class="flex w-full flex-col px-5 py-32 bg-gray-100 lg:px-10">
 		<h2 class="mb-2 text-3xl">Thoughts</h2>
-		<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-2">
+		<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
 			{#each data.posts as post}
 				<div class="mb-5">
-					<img src={post.image.asset.url} alt={post.title} />
+					<img class="ring-2 ring-black mb-2" src={post.image.asset.url} alt={post.title} />
 					<h3 class="">{post.title}</h3>
 					<a class="text-sm underline underline-offset-2" href={'/thoughts/' + post.slug.current}
 						>read more</a
