@@ -66,7 +66,7 @@
 	</div>
 </div>
 
-<section class="grid grid-cols-2 bg-gray-200 py-32 lg:grid-cols-4 lg:gap-10 lg:px-10">
+<section class="grid grid-cols-2 bg-gray-100 py-32 lg:grid-cols-4 lg:gap-10 lg:px-10">
 	{#each founder.imageGallery as image}
 		<img
 			class="aspect-square h-full w-full object-cover"
