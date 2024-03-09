@@ -23,7 +23,7 @@
 <svelte:window bind:scrollY />
 
 <header
-	class={`fixed flex w-full justify-between bg-white p-5 lg:px-10 ${scrollY > 0 ? 'border-b-2 border-black transition-all duration-150' : ''}`}
+	class={`fixed flex w-full z-10 justify-between bg-white p-5 lg:px-10 ${scrollY > 0 ? 'border-b-2 border-black transition-all duration-150' : ''}`}
 >
 	<a href="/" class="corner bold text-4xl tracking-widest">
 		D<span class="inline-block w-7 text-center">{character}</span>ANA

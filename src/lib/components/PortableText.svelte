@@ -15,10 +15,19 @@
 			h3,
 			h4,
 			h5 {
-				padding-bottom: 0.5rem;
-				font-weight: 800;
+				@apply font-semibold uppercase;
+			}
 
-				@apply text-pink-100;
+			h1 {
+				@apply text-4xl;
+			}
+
+			h2 {
+				@apply text-3xl;
+			}
+
+			h3 {
+				@apply text-2xl;
 			}
 			ul,
 			p {
