@@ -29,6 +29,15 @@
 			h3 {
 				@apply text-2xl;
 			}
+
+			h4 {
+				@apply text-xl;
+			}
+
+			h5 {
+				@apply text-lg;
+			}
+
 			ul,
 			p {
 				@apply pb-5;
