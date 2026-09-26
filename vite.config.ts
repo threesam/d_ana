@@ -1,9 +1,14 @@
+/// <reference types="vitest/config" />
 import { sveltekit } from '@sveltejs/kit/vite'
-import { defineConfig } from 'vitest/config'
+import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [tailwindcss(), sveltekit()],
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
+		// Pure-logic unit tests, colocated next to the module they cover.
+		// Browser/e2e stays in Playwright (tests/*.spec.ts).
+		include: ['src/**/*.test.ts'],
+		environment: 'node'
 	}
 })

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
 	import PortableText from '$lib/components/PortableText.svelte'
 	import SEO from 'svelte-seo'
+	import type { PageProps } from './$types'
 
-	export let data
+	let { data }: PageProps = $props()
 </script>
 
 <SEO
@@ -13,7 +14,7 @@
 	}}
 />
 
-<section class="border-dark grid grid-cols-1 border-b lg:grid-cols-2">
+<section class="grid grid-cols-1 border-b border-dark lg:grid-cols-2">
 	<img src={data.post.image.asset.url} alt={data.post.title} />
 	<h1 class="px-5 py-5 text-xl font-semibold lg:grid lg:place-content-center lg:px-10 lg:text-3xl">
 		{data.post.title}

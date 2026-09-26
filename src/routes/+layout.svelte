@@ -1,15 +1,16 @@
-<script>
-	import Header from '../lib/components/Header.svelte'
+<script lang="ts">
+	import Header from '$lib/components/Header.svelte'
+	import type { LayoutProps } from './$types'
 	import './styles.css'
 
-	export let data
+	let { children }: LayoutProps = $props()
 </script>
 
-<div class="app min-h-screen font-sans relative">
+<div class="app relative min-h-screen font-sans">
 	<Header />
 
 	<main>
-		<slot />
+		{@render children()}
 	</main>
 
 	<footer class="w-full border-t border-dark p-10 text-center text-dark">
