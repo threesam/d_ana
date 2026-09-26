@@ -1,28 +1,126 @@
-@import '@fontsource/fira-mono';
+@import 'tailwindcss';
 
-@font-face {
-	font-family: 'Montserrat';
-	font-display: swap;
-	src: url('$lib/assets/fonts/Montserrat-VariableFont_wght.ttf'),
-		url('$lib/assets/fonts/Montserrat-Italic-VariableFont_wght.ttf');
+/*
+  Tailwind v3 parity (the v4 upgrade is meant to render identically):
+  - v4 gates `hover:` behind (hover: hover); v3 applied it on tap too, which is
+    how the hero play/pause overlay shows on touch devices.
+  - v4 palette moved to oklch; pin the few palette colors in use to v3's hex.
+*/
+@custom-variant hover (&:hover);
+
+@theme {
+	--font-*: initial;
+	--font-sans: Montserrat, sans-serif;
+	--font-mono: monospace;
+
+	--list-style-type-*: initial;
+	--list-style-type-none: none;
+	--list-style-type-disc: disc;
+	--list-style-type-decimal: decimal;
+	--list-style-type-square: square;
+	--list-style-type-roman: upper-roman;
+
+	--background-image-gradient-fade: linear-gradient(180deg, #000, transparent);
+	--background-image-gradient-3:
+		radial-gradient(circle at top left, rgba(19, 19, 19, 0.55), transparent 80%),
+		radial-gradient(circle at top right, rgba(33, 48, 25, 0.75), transparent 100%),
+		radial-gradient(at bottom left, rgba(33, 48, 25, 0.75), transparent 100%),
+		radial-gradient(at bottom right, rgba(19, 19, 19, 0.55), transparent 80%);
+
+	--color-gray-100: #f3f4f6;
+	--color-gray-200: #e5e7eb;
+	--color-pink-200: #fbcfe8;
+
+	--color-primary: rgb(183, 198, 175);
+	--color-dark: #111111;
+	--color-light: #fafafa;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentcolor);
+	}
+
+	/* v4 preflight dropped the pointer cursor on buttons. */
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
+}
+
+@layer base {
+	@font-face {
+		font-family: 'Montserrat';
+		font-display: swap;
+		src:
+			url('$lib/assets/fonts/Montserrat-VariableFont_wght.ttf'),
+			url('$lib/assets/fonts/Montserrat-Italic-VariableFont_wght.ttf');
+	}
+}
 
 :root {
-	--font-body: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-	--font-mono: 'Fira Mono', monospace;
-	--color-bg-0: rgb(202, 216, 228);
-	--color-bg-1: hsl(209, 36%, 86%);
-	--color-bg-2: hsl(224, 44%, 95%);
-	--color-theme-1: #ff3e00;
-	--color-theme-2: #4075a6;
+	--font-body:
+		Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+		'Open Sans', 'Helvetica Neue', sans-serif;
 	--color-text: rgba(0, 0, 0, 0.7);
-	--column-width: 42rem;
-	--column-margin-top: 4rem;
 	font-family: var(--font-body);
 	color: var(--color-text);
+}
+
+/* Portable Text body styles (moved from PortableText.svelte's global scss block). */
+.portable-text h1,
+.portable-text h2,
+.portable-text h3,
+.portable-text h4,
+.portable-text h5 {
+	@apply font-semibold uppercase;
+}
+
+.portable-text h1 {
+	@apply text-4xl;
+}
+
+.portable-text h2 {
+	@apply text-3xl;
+}
+
+.portable-text h3 {
+	@apply text-2xl;
+}
+
+.portable-text h4 {
+	@apply text-xl;
+}
+
+.portable-text h5 {
+	@apply text-lg;
+}
+
+.portable-text ul,
+.portable-text p {
+	@apply pb-5;
+}
+
+.portable-text a {
+	@apply border-b-2 border-pink-200 transition-all duration-100;
+}
+
+.portable-text a:hover {
+	@apply border-transparent pb-1 text-pink-200;
+}
+
+.portable-text blockquote {
+	@apply text-dark border-2 border-black bg-pink-200 p-5 text-sm sm:p-10 md:text-lg;
 }
