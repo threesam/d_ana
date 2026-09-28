@@ -9,13 +9,6 @@ export const prerender = true
 export const load: LayoutServerLoad = async () => {
 	const settings = await client.fetch<SiteSettings>(`*[_type == 'siteSettings'][0]{
 		...,
-		image{
-			...,
-			asset->
-		},
-		icons[]{
-			asset->
-		},
 		founder->{
 			...,
 			image{

@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { dev } from '$app/environment'
 	import PortableText from '$lib/components/PortableText.svelte'
 	import SEO from 'svelte-seo'
 	import video from '$lib/assets/videos/sample.mp4'
-	import devVideo from '$lib/assets/videos/dev-sample.mp4'
 	import Play from '$lib/components/icons/Play.svelte'
 	import Pause from '$lib/components/icons/Pause.svelte'
 	import BioBlock from '$lib/components/BioBlock.svelte'
@@ -52,7 +50,7 @@
 			autoplay
 			playsinline
 			id="hero-video"
-			src={dev ? devVideo : video}
+			src={video}
 			bind:this={videoElement}
 			use:play
 		></video>
@@ -117,7 +115,7 @@
 					alt={post.title}
 					loading="lazy"
 				/>
-				<h3 class="">{post.title}</h3>
+				<h3>{post.title}</h3>
 				<a class="text-sm underline underline-offset-2" href={'/thoughts/' + post.slug.current}
 					>read more<span class="sr-only">: {post.title}</span></a
 				>

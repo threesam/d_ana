@@ -6,7 +6,6 @@ import type { InputValue } from '@portabletext/svelte'
 export interface SanityAsset {
 	_id: string
 	url: string
-	originalFilename: string
 	metadata: { dimensions: { width: number; height: number } }
 }
 
