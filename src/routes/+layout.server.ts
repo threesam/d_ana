@@ -23,8 +23,8 @@ export const load: LayoutServerLoad = async () => {
 				asset->
 			},
 			imageGallery[]{
-				...
-				asset->
+				...asset->,
+				alt
 			},
 		}
 	}`)

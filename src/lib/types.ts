@@ -7,6 +7,12 @@ export interface SanityAsset {
 	_id: string
 	url: string
 	originalFilename: string
+	metadata: { dimensions: { width: number; height: number } }
+}
+
+// A gallery item: the dereferenced asset spread in, plus the image's own alt.
+export interface GalleryImage extends SanityAsset {
+	alt?: string | undefined
 }
 
 export interface SanityImage {
@@ -17,7 +23,7 @@ export interface Founder {
 	name: string
 	bio: InputValue
 	image: SanityImage
-	imageGallery: SanityAsset[]
+	imageGallery: GalleryImage[]
 }
 
 export interface SiteSettings {
@@ -29,6 +35,7 @@ export interface SiteSettings {
 export interface Post {
 	_id: string
 	title: string
+	description?: string | null | undefined
 	slug: { current: string }
 	image: SanityImage
 	body: InputValue

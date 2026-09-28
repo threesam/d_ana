@@ -96,7 +96,8 @@
 	@apply text-3xl;
 }
 
-.portable-text h3 {
+.portable-text h3,
+.portable-text .pt-h3 {
 	@apply text-2xl;
 }
 

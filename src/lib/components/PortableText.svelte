@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { PortableText, type InputValue } from '@portabletext/svelte'
+	import { PortableText, type InputValue, type PortableTextComponents } from '@portabletext/svelte'
 
 	interface Props {
 		blocks?: InputValue | undefined
+		components?: PortableTextComponents | undefined
 	}
 
-	let { blocks = [] }: Props = $props()
+	let { blocks = [], components = {} }: Props = $props()
 </script>
 
 <section class="portable-text mx-auto">
-	<PortableText value={blocks} />
+	<PortableText value={blocks} {components} />
 </section>
