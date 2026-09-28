@@ -50,6 +50,7 @@
 			muted
 			loop
 			autoplay
+			playsinline
 			id="hero-video"
 			src={dev ? devVideo : video}
 			bind:this={videoElement}
