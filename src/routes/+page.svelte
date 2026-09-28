@@ -76,10 +76,13 @@
 
 <section class="grid grid-cols-2 bg-gray-100 py-32 lg:grid-cols-4 lg:gap-10 lg:px-10">
 	{#each founder.imageGallery as image, i (i)}
+		{@const img = urlFor(image).auto('format')}
 		<!-- alt comes from the Studio; without it the photo is decorative (filenames like IMG_6368.JPG aren't alt text) -->
 		<img
 			class="aspect-square h-full w-full object-cover"
-			src={urlFor(image).width(800).auto('format').url()}
+			src={img.width(800).url()}
+			srcset="{img.width(600).url()} 600w, {img.width(1200).url()} 1200w"
+			sizes="(min-width: 1024px) 25vw, 50vw"
 			alt={image.alt ?? ''}
 		/>
 	{/each}
@@ -107,7 +110,7 @@
 			<div class="mb-5">
 				<img
 					class="mb-2 ring-2 ring-black"
-					src={urlFor(post.image.asset).width(800).auto('format').url()}
+					src={urlFor(post.image.asset).auto('format').url()}
 					width={post.image.asset.metadata.dimensions.width}
 					height={post.image.asset.metadata.dimensions.height}
 					alt={post.title}
