@@ -14,7 +14,7 @@
 	>
 	<Header />
 
-	<main id="main">
+	<main id="main" tabindex="-1" class="outline-none">
 		{@render children()}
 	</main>
 
