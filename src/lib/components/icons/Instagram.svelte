@@ -2,26 +2,24 @@
 	interface Props {
 		width?: number | undefined
 		height?: number | undefined
-		color?: string | undefined
 	}
 
-	let { width = 30, height = 30, color = 'currentColor' }: Props = $props()
+	let { width = 30, height = 30 }: Props = $props()
 </script>
 
 <svg
 	viewBox="0 0 15 15"
-	fill={color}
+	fill="currentColor"
 	xmlns="http://www.w3.org/2000/svg"
 	{width}
 	{height}
 	class="hover:text-primary transition duration-300"
 >
-	<path d="M7.5 5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z" fill="currentColor" />
+	<path d="M7.5 5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z" />
 	<path
 		fill-rule="evenodd"
 		clip-rule="evenodd"
 		d="M4.5 0A4.5 4.5 0 000 4.5v6A4.5 4.5 0 004.5 15h6a4.5 4.5 0 004.5-4.5v-6A4.5 4.5 0 0010.5
 		0h-6zM4 7.5a3.5 3.5 0 117 0 3.5 3.5 0 01-7 0zM11 4h1V3h-1v1z"
-		fill="currentColor"
 	/>
 </svg>

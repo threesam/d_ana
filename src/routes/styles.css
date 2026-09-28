@@ -13,27 +13,12 @@
 	--font-sans: Montserrat, sans-serif;
 	--font-mono: monospace;
 
-	--list-style-type-*: initial;
-	--list-style-type-none: none;
-	--list-style-type-disc: disc;
-	--list-style-type-decimal: decimal;
-	--list-style-type-square: square;
-	--list-style-type-roman: upper-roman;
-
-	--background-image-gradient-fade: linear-gradient(180deg, #000, transparent);
-	--background-image-gradient-3:
-		radial-gradient(circle at top left, rgba(19, 19, 19, 0.55), transparent 80%),
-		radial-gradient(circle at top right, rgba(33, 48, 25, 0.75), transparent 100%),
-		radial-gradient(at bottom left, rgba(33, 48, 25, 0.75), transparent 100%),
-		radial-gradient(at bottom right, rgba(19, 19, 19, 0.55), transparent 80%);
-
 	--color-gray-100: #f3f4f6;
 	--color-gray-200: #e5e7eb;
 	--color-pink-200: #fbcfe8;
 
 	--color-primary: rgb(183, 198, 175);
 	--color-dark: #111111;
-	--color-light: #fafafa;
 }
 
 /*
@@ -64,9 +49,7 @@
 	@font-face {
 		font-family: 'Montserrat';
 		font-display: swap;
-		src:
-			url('$lib/assets/fonts/Montserrat-VariableFont_wght.ttf'),
-			url('$lib/assets/fonts/Montserrat-Italic-VariableFont_wght.ttf');
+		src: url('$lib/assets/fonts/Montserrat-VariableFont_wght.ttf');
 	}
 }
 
