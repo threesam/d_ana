@@ -7,9 +7,14 @@
 </script>
 
 <div class="app relative min-h-screen font-sans">
+	<a
+		href="#main"
+		class="sr-only z-20 bg-white p-2 text-dark focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+		>Skip to content</a
+	>
 	<Header />
 
-	<main>
+	<main id="main" tabindex="-1" class="outline-none">
 		{@render children()}
 	</main>
 
