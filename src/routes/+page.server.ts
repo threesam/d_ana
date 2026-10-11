@@ -1,5 +1,5 @@
-import type { Post } from '$lib/types'
-import { client } from '$lib/utils/sanity'
+import type { Post } from '#lib/types.ts'
+import { client } from '#lib/utils/sanity.ts'
 import type { PageServerLoad } from './$types'
 
 // since there's no dynamic data here, we can prerender

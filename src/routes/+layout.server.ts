@@ -1,5 +1,5 @@
-import type { SiteSettings } from '$lib/types'
-import { client } from '$lib/utils/sanity'
+import type { SiteSettings } from '#lib/types.ts'
+import { client } from '#lib/utils/sanity.ts'
 import type { LayoutServerLoad } from './$types'
 
 // since there's no dynamic data here, we can prerender

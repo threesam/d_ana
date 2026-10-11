@@ -1,11 +1,11 @@
 <script lang="ts">
-	import PortableText from '$lib/components/PortableText.svelte'
+	import PortableText from '#lib/components/PortableText.svelte'
 	import SEO from 'svelte-seo'
-	import video from '$lib/assets/videos/sample.mp4'
-	import Play from '$lib/components/icons/Play.svelte'
-	import Pause from '$lib/components/icons/Pause.svelte'
-	import BioBlock from '$lib/components/BioBlock.svelte'
-	import { urlFor } from '$lib/utils/sanity'
+	import video from '#lib/assets/videos/sample.mp4'
+	import Play from '#lib/components/icons/Play.svelte'
+	import Pause from '#lib/components/icons/Pause.svelte'
+	import BioBlock from '#lib/components/BioBlock.svelte'
+	import { urlFor } from '#lib/utils/sanity.ts'
 	import type { PageProps } from './$types'
 
 	let { data }: PageProps = $props()

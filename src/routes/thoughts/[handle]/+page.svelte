@@ -1,8 +1,8 @@
 <script lang="ts">
-	import PortableText from '$lib/components/PortableText.svelte'
+	import PortableText from '#lib/components/PortableText.svelte'
 	import SEO from 'svelte-seo'
 	import { toPlainText } from '@portabletext/svelte'
-	import { urlFor } from '$lib/utils/sanity'
+	import { urlFor } from '#lib/utils/sanity.ts'
 	import type { PageProps } from './$types'
 
 	let { data }: PageProps = $props()
