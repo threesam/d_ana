@@ -155,9 +155,10 @@ a place. Never a street.
 
 A pin board, drawn as one SVG at build time. The whole world is always in view
 (Natural Earth projection fitted to the sphere, never to the pins). The continents
-are a paper cut-out on cork, with one black pin per place, sized by how many pieces
-were made there. City names in mono beside the larger clusters. No tiles and no
-script in the browser. Cork is the one colour on the site that is not a photograph.
+are a paper cut-out on a grey board with a cork grain, with one black pin per place,
+sized by how many pieces were made there. City names in mono beside the larger
+clusters. No tiles and no script in the browser. The board stays inside the page's
+palette: the texture is grain, not colour.
 
 ## Hiding and showing (edit mode)
 

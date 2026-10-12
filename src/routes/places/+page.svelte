@@ -30,12 +30,13 @@
 			>
 			<defs>
 				<filter id="cork-grain" x="0" y="0" width="100%" height="100%">
-					<feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="11" />
+					<feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="11" />
+					<!-- ink specks: the colour is the page's ink, only the grain's alpha comes from the noise -->
 					<feColorMatrix
-						values="0 0 0 0 0.36
-						        0 0 0 0 0.24
-						        0 0 0 0 0.12
-						        0 0 0 -2.2 1.25"
+						values="0 0 0 0 0.07
+						        0 0 0 0 0.07
+						        0 0 0 0 0.07
+						        0 0 0 -1.5 0.86"
 					/>
 				</filter>
 				<filter id="lift" x="-10%" y="-10%" width="120%" height="130%">
@@ -82,18 +83,15 @@
 		line-height: 1;
 	}
 
-	/* The one place the site carries a colour of its own: the board is cork, on purpose. */
+	/* Cork in the page's own greys: the texture is grain, not colour. */
 	.board {
-		--cork: #c8a478;
-		--frame: #7a5a36;
 		display: block;
 		width: 100%;
 		height: auto;
-		border: clamp(6px, 1vw, 12px) solid var(--frame);
-		box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+		border: clamp(4px, 0.7vw, 8px) solid var(--color-ink);
 	}
 	.cork {
-		fill: var(--cork);
+		fill: var(--color-rule);
 	}
 	.land {
 		fill: var(--color-paper);
