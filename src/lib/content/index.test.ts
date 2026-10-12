@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dayLabel, monthLabel, summarize } from './index.ts'
+import { dayLabel, mentions, monthLabel, summarize, unnamed } from './index.ts'
 import type { Image } from './types.ts'
 
 const image = (key: string): Image => ({
@@ -47,5 +47,46 @@ describe('labels', () => {
 	it('names a month, with its year when asked', () => {
 		expect(monthLabel('2019-03')).toBe('March')
 		expect(monthLabel('2019-03', true)).toBe('March 2019')
+	})
+})
+
+describe('mentions', () => {
+	it('leaves words with nobody named in them as one part', () => {
+		expect(mentions('new year, new zip code. lol.')).toEqual([
+			{ text: 'new year, new zip code. lol.', handle: null }
+		])
+	})
+
+	it('turns an account she named into its own part', () => {
+		expect(mentions('@valerieleelove ‘s attn. to detail!!')).toEqual([
+			{ text: '@valerieleelove', handle: 'valerieleelove' },
+			{ text: ' ‘s attn. to detail!!', handle: null }
+		])
+	})
+
+	it('keeps a full stop after a name out of the name, and a dot inside it in', () => {
+		expect(mentions('thanks @avg.hgt_adams.')).toEqual([
+			{ text: 'thanks ', handle: null },
+			{ text: '@avg.hgt_adams', handle: 'avg.hgt_adams' },
+			{ text: '.', handle: null }
+		])
+	})
+
+	it('does not take an email address for an account', () => {
+		expect(mentions('write to d@example.com')).toEqual([
+			{ text: 'write to d@example.com', handle: null }
+		])
+	})
+})
+
+describe('unnamed', () => {
+	it('keeps only the people her words did not already name', () => {
+		expect(unnamed(['@ValerieLeeLove', '@someone'], 'love @valerieleelove')).toEqual(['@someone'])
+		expect(unnamed(['@someone'], null)).toEqual(['@someone'])
+	})
+
+	it('drops the full stop the import left on the end of a name', () => {
+		expect(unnamed(['@diaryofacrunchymom.'], 'so good')).toEqual(['@diaryofacrunchymom'])
+		expect(unnamed(['@diaryofacrunchymom.'], 'via @diaryofacrunchymom.')).toEqual([])
 	})
 })

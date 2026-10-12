@@ -41,3 +41,38 @@ export function monthLabel(month: string, withYear = false) {
 	const name = monthFormat.format(utc(`${month}-01`))
 	return withYear ? `${name} ${month.slice(0, 4)}` : name
 }
+
+export interface Words {
+	text: string
+	/** The account this part names, without the `@`, or null for plain words. */
+	handle: string | null
+}
+
+// an account name: letters, digits, _ and ., never ending on a dot, and not the tail of an email
+const ACCOUNT = /(?<![\w.@])@([\w](?:[\w.]*[\w])?)/g
+
+/** Her words cut into plain parts and the accounts she named, so a name can be its own link. */
+export function mentions(text: string): Words[] {
+	const parts: Words[] = []
+	let at = 0
+	for (const match of text.matchAll(ACCOUNT)) {
+		if (match.index > at) parts.push({ text: text.slice(at, match.index), handle: null })
+		parts.push({ text: match[0], handle: match[1] ?? null })
+		at = match.index + match[0].length
+	}
+	if (at < text.length) parts.push({ text: text.slice(at), handle: null })
+	return parts
+}
+
+/** The people tagged on a piece whose names her words do not already carry. */
+export function unnamed(people: string[], text: string | null) {
+	const named = new Set(
+		mentions(text ?? '').flatMap((part) =>
+			part.handle === null ? [] : [part.handle.toLowerCase()]
+		)
+	)
+	// ponytail: some imported names kept the sentence's full stop; trimmed here, not in the data
+	return people
+		.map((person) => person.replace(/\.+$/, ''))
+		.filter((person) => !named.has(person.slice(1).toLowerCase()))
+}

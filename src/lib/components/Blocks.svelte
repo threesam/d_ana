@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Block, Figure } from '#lib/content/compose.ts'
-	import { dayLabel } from '#lib/content/index.ts'
+	import { dayLabel, mentions, unnamed } from '#lib/content/index.ts'
 	import Photo from './Photo.svelte'
 
 	interface Props {
@@ -19,6 +19,20 @@
 	}
 </script>
 
+{#snippet account(handle: string, label: string)}
+	<a href="https://www.instagram.com/{handle}/" rel="noopener">{label}</a>
+{/snippet}
+
+<!-- her words, with every account she named as the link to it -->
+{#snippet words(text: string)}
+	<p class="text">
+		{#each mentions(text) as part, i (i)}{#if part.handle === null}{part.text}{:else}{@render account(
+					part.handle,
+					part.text
+				)}{/if}{/each}
+	</p>
+{/snippet}
+
 {#snippet caption(figure: Figure)}
 	<p class="mono muted">
 		<time datetime={figure.piece.day}>{dayLabel(figure.piece.day)}</time>{#if where(figure) !== ''}, {where(
@@ -26,16 +40,15 @@
 			)}{/if}
 	</p>
 	{#if figure.lead}
+		{@const others = unnamed(figure.piece.people, figure.piece.text)}
 		{#if figure.piece.text}
-			<p class="text">{figure.piece.text}</p>
+			{@render words(figure.piece.text)}
 		{/if}
-		{#if figure.piece.people.length > 0}
+		{#if others.length > 0}
 			<p class="mono muted">
 				With
-				{#each figure.piece.people as person, i (person)}
-					{i > 0 ? ', ' : ''}<a href="https://www.instagram.com/{person.slice(1)}/" rel="noopener"
-						>{person}</a
-					>
+				{#each others as person, i (person)}
+					{i > 0 ? ', ' : ''}{@render account(person.slice(1), person)}
 				{/each}
 			</p>
 		{/if}
@@ -76,7 +89,7 @@
 				<time datetime={block.piece.day}>{dayLabel(block.piece.day)}</time>
 			</p>
 			{#if block.piece.text}
-				<p class="text">{block.piece.text}</p>
+				{@render words(block.piece.text)}
 			{/if}
 		</article>
 	{/if}
