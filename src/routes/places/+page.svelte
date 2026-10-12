@@ -23,8 +23,10 @@
 			aria-labelledby="map-title"
 		>
 			<title id="map-title"
-				>A map with one dot for each of {data.dots.length} places where the photographs were made</title
+				>An outline map of the world with one dot for each of {data.dots.length} places where the photographs
+				were made</title
 			>
+			<path class="land" d={data.land} />
 			{#each data.dots as dot (`${String(dot.x)},${String(dot.y)}`)}
 				<circle cx={dot.x} cy={dot.y} r={dot.r} />
 				{#if dot.label}
@@ -61,14 +63,28 @@
 		height: auto;
 		border-block: 1px solid var(--color-rule);
 	}
+	.land {
+		fill: none;
+		stroke: var(--color-ink);
+		stroke-width: 0.7;
+		stroke-linejoin: round;
+		vector-effect: non-scaling-stroke;
+	}
 	circle {
 		fill: var(--color-ink);
+		stroke: var(--color-paper);
+		stroke-width: 1.5;
+		paint-order: stroke;
 	}
 	text {
 		fill: var(--color-graphite);
 		font: 400 12px var(--font-mono);
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
+		/* a paper halo so a name stays readable where it crosses a coastline */
+		stroke: var(--color-paper);
+		stroke-width: 4;
+		paint-order: stroke;
 	}
 
 	.cities {

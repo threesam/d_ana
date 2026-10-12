@@ -1,3 +1,5 @@
+import { geoMercator, geoPath, type GeoPermissibleObjects } from 'd3-geo'
+
 /** Where one piece was made. `city` may be empty. */
 export interface Spot {
 	city: string
@@ -22,62 +24,71 @@ export interface Frame {
 	pad: number
 }
 
+export interface Chart {
+	dots: Dot[]
+	/** SVG path data for the coastlines and borders inside the frame. Empty when no world was given. */
+	land: string
+}
+
 const LABELS = 8
 // room one printed name needs, in frame units: names closer than this would overprint
 const LABEL_W = 150
 const LABEL_H = 18
+/** Mercator scale for a map with a single place on it: roughly a country wide. */
+const ALONE = 900
 
 /**
- * A map with no map: one dot per place, bigger where more was made, laid out by longitude and
- * latitude and scaled to fit the frame.
- * ponytail: plain equirectangular projection, fine for a scatter of dots; reach for d3-geo if a
- * coastline is ever drawn under them.
+ * An ink map: the world's outline drawn under one dot per place, bigger where more was made.
+ * The view is fitted to the places, so it shows only the part of the world she has been in.
  */
-export function plot(spots: Spot[], frame: Frame): Dot[] {
+export function plot(spots: Spot[], frame: Frame, world?: GeoPermissibleObjects): Chart {
 	const groups = new Map<string, Spot[]>()
 	for (const spot of spots) {
 		const key = spot.city === '' ? `${spot.lat.toFixed(1)},${spot.lng.toFixed(1)}` : spot.city
 		groups.set(key, [...(groups.get(key) ?? []), spot])
 	}
-	if (groups.size === 0) return []
+	if (groups.size === 0) return { dots: [], land: '' }
 
 	const mean = (values: number[]) => values.reduce((a, b) => a + b, 0) / values.length
 	const places = [...groups.values()].map((members) => ({
 		city: members[0]?.city ?? '',
 		count: members.length,
-		lat: mean(members.map((m) => m.lat)),
-		lng: mean(members.map((m) => m.lng))
+		point: [mean(members.map((m) => m.lng)), mean(members.map((m) => m.lat))] as [number, number]
 	}))
 
-	const lats = places.map((p) => p.lat)
-	const squeeze = Math.cos((mean([Math.min(...lats), Math.max(...lats)]) * Math.PI) / 180)
-	const flat = places.map((p) => ({ ...p, px: p.lng * squeeze, py: -p.lat }))
-	const xs = flat.map((p) => p.px)
-	const ys = flat.map((p) => p.py)
-	const spanX = Math.max(...xs) - Math.min(...xs)
-	const spanY = Math.max(...ys) - Math.min(...ys)
-	const innerW = frame.width - 2 * frame.pad
-	const innerH = frame.height - 2 * frame.pad
-	const scale = Math.min(
-		spanX > 0 ? innerW / spanX : Infinity,
-		spanY > 0 ? innerH / spanY : Infinity
+	const projection = geoMercator().clipExtent([
+		[0, 0],
+		[frame.width, frame.height]
+	])
+	projection.fitExtent(
+		[
+			[frame.pad, frame.pad],
+			[frame.width - frame.pad, frame.height - frame.pad]
+		],
+		{ type: 'MultiPoint', coordinates: places.map((p) => p.point) }
 	)
-	const fit = Number.isFinite(scale) ? scale : 0
-	const offsetX = (frame.width - spanX * fit) / 2
-	const offsetY = (frame.height - spanY * fit) / 2
+	// one place (or several on one spot) has no extent to fit: centre it at a fixed scale
+	const first = places[0]
+	if (first !== undefined && (places.length === 1 || !Number.isFinite(projection.scale()))) {
+		projection
+			.scale(ALONE)
+			.center(first.point)
+			.translate([frame.width / 2, frame.height / 2])
+	}
 
 	// one decimal is finer than a pixel and keeps the markup short
 	const round = (n: number) => Math.round(n * 10) / 10
-	const dots = flat.map((p) => {
-		const x = round(offsetX + (p.px - Math.min(...xs)) * fit)
+	const dots: Dot[] = places.map((p) => {
+		const [px, py] = projection(p.point) ?? [0, 0]
+		const x = round(px)
 		return {
 			x,
-			y: round(offsetY + (p.py - Math.min(...ys)) * fit),
+			y: round(py),
 			r: round(2 + 1.6 * Math.sqrt(p.count)),
 			count: p.count,
 			city: p.city,
 			label: false,
-			anchor: x > frame.width - frame.pad - LABEL_W ? ('end' as const) : ('start' as const)
+			anchor: x > frame.width - frame.pad - LABEL_W ? 'end' : 'start'
 		}
 	})
 
@@ -95,5 +106,6 @@ export function plot(spots: Spot[], frame: Frame): Dot[] {
 		}
 	}
 
-	return dots
+	const land = world === undefined ? '' : (geoPath(projection).digits(1)(world) ?? '')
+	return { dots, land }
 }
