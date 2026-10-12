@@ -127,8 +127,57 @@ test('the row of months sticks, follows the page, and a click glides to that mon
 	const hop = await passed()
 	expect(hop.places).toBeGreaterThan(3)
 	expect(hop.at - hop.first).toBeLessThanOrEqual(801)
-	// and then the row is tied to the page again
-	await expect(page.locator('.run')).not.toHaveClass(/hop/)
+	// and then the row follows the page again
+	await months.nth(1).evaluate((month) => {
+		month.scrollIntoView({ behavior: 'instant' })
+	})
+	await expect.poll(async () => Math.abs((await left(1)) - column)).toBeLessThan(1)
+})
+
+test('a month that has gone by comes back with a swipe along the row', async ({ page }) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await page.goto('/')
+	await page.locator('a.year').first().click()
+	const months = page.locator('.run section')
+	const names = page.locator('.ribbon li a')
+	const column = await months
+		.first()
+		.locator('h2')
+		.evaluate((heading) => heading.getBoundingClientRect().left)
+	// how far a name stands from the left of the column, and how solid it is drawn
+	const off = async (name: typeof names) =>
+		Math.abs((await name.evaluate((a) => a.getBoundingClientRect().left)) - column)
+	const solid = (name: typeof names) => name.evaluate((a) => getComputedStyle(a).opacity)
+
+	// at the last month, the first month's name has gone off to the left
+	await months.last().evaluate((month) => {
+		month.scrollIntoView({ behavior: 'instant' })
+	})
+	await expect.poll(() => off(names.last())).toBeLessThan(1)
+	await expect.poll(() => solid(names.first())).toBe('0')
+
+	// a swipe along the row (two fingers on a trackpad here, one on a phone) brings it back
+	await page.locator('.ribbon').hover()
+	await page.mouse.wheel(-9000, 0)
+	await expect.poll(() => off(names.first())).toBeLessThan(1)
+	await expect.poll(() => solid(names.first())).toBe('1')
+
+	// read on, and the row goes back to the month the page is in
+	await expect
+		.poll(async () => {
+			await page.mouse.wheel(0, 20)
+			return off(names.last())
+		})
+		.toBeLessThan(1)
+
+	// swipe back again and click the first name: the page goes to that month
+	await page.mouse.wheel(-9000, 0)
+	await expect.poll(() => solid(names.first())).toBe('1')
+	await names.first().click()
+	await expect
+		.poll(() => months.first().evaluate((month) => Math.abs(month.getBoundingClientRect().top)))
+		.toBeLessThan(1)
+	await expect.poll(() => off(names.first())).toBeLessThan(1)
 })
 
 test('the type faces load and nothing the page asks for is missing', async ({ page }) => {

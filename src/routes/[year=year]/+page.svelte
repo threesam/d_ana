@@ -30,7 +30,8 @@
 	     app.html moves it). It is there for the eye and the pointer only. Screen readers and the
 	     keyboard have the headings themselves and the list of months at the top of the page. -->
 	<div class="ribbon" aria-hidden="true">
-		<div class="window">
+		<!-- the names are one strip that scrolls sideways (`tabindex` keeps it out of the tab order) -->
+		<div class="window" tabindex="-1">
 			<ol>
 				{#each data.months as month, i (month.month)}
 					<li style:--i={i}>
@@ -122,10 +123,22 @@
 	.run:global(.stuck) .ribbon {
 		border-bottom: 1px solid var(--color-rule);
 	}
+	/* the hairline across the column, as each month has over its heading */
+	.ribbon::before {
+		content: '';
+		position: absolute;
+		inset: 0 var(--bleed) auto;
+		border-top: 1px solid var(--color-rule);
+	}
+	/* The names are one strip that scrolls sideways. The script moves it as the page moves. Once
+	   the row is stuck the reader can move it too, with a swipe, to bring back a month that has
+	   gone by. Until then the one name showing is a heading, and stays put. */
 	.window {
 		height: 100%;
-		padding-inline: var(--bleed);
-		overflow: clip;
+		overflow: hidden;
+		/* at either end of the strip, a swipe is not the browser's "back" or "forward" */
+		overscroll-behavior-x: contain;
+		scrollbar-width: none;
 		/* a name fades out as it leaves the column, on either side: softly at the edge here, and
 		   as a whole by the script, which matters on a phone where the margin is 16px wide */
 		mask-image: linear-gradient(
@@ -136,19 +149,21 @@
 			transparent
 		);
 	}
-	.window::before {
-		content: '';
-		display: block;
-		border-top: 1px solid var(--color-rule);
+	.window::-webkit-scrollbar {
+		display: none;
+	}
+	.run:global(.stuck) .window {
+		overflow-x: auto;
 	}
 	.ribbon ol {
 		display: flex;
 		column-gap: 1em;
 		width: max-content;
-		padding-top: 20px;
+		/* over the names, the hairline and the same space a heading has; before them, the margin, so
+		   the first starts at the column (the script adds room after the last) */
+		padding: 21px 0 0 var(--bleed);
 		font: 400 var(--month) / 1.1 var(--font-title);
 		white-space: nowrap;
-		will-change: transform;
 	}
 	/* Until the row sticks, only the first name shows: it is that month's heading. Then the
 	   others arrive one after another. Leaving, they go together. */
@@ -167,19 +182,14 @@
 		color: var(--color-graphite);
 		text-decoration-line: none;
 	}
-	.ribbon a:hover {
-		text-decoration-line: underline;
+	/* (only where a pointer hovers: on a phone the name last tapped would stay underlined) */
+	@media (hover: hover) {
+		.ribbon a:hover {
+			text-decoration-line: underline;
+		}
 	}
 	.ribbon li:global(.now) a {
 		color: var(--color-ink);
-	}
-	/* A click on a month many screens away cuts most of the way there (the script says why). For
-	   that moment (`hop`) the row is not tied to the page: it slides straight to the month. */
-	.run:global(.hop) .ribbon ol {
-		transition: transform 0.7s cubic-bezier(0.3, 0, 0.2, 1);
-	}
-	.run:global(.hop) .ribbon a {
-		transition: opacity 0.7s;
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.ribbon li,

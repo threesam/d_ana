@@ -25,7 +25,8 @@ Design and content model: `docs/superpowers/specs/2026-10-11-archive-garden-desi
 - `src/routes/+layout.server.ts` — `prerender = true` and `csr = false` for the
   whole site: static HTML, no framework JavaScript shipped. The one script is a few
   inline lines in `src/app.html` with two jobs: it plays a video while it is on
-  screen, and on a year page it moves the sticky row of months with the page. Keep it
+  screen, and on a year page it moves the sticky row of months with the page (the row
+  is a strip that scrolls sideways, so a swipe moves it too). Keep it
   that way; anything that needs more script or a server (the future edit mode)
   opts out per route.
 - `src/routes/+page.*` — home: the title page and the index of years and themes.

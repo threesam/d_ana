@@ -174,12 +174,19 @@ next month draws nearer, slowly at first and quickest at the end, and that name 
 in the heading's place exactly as its own section does. A name fades as it leaves the
 column on either side.
 
-A click on a name glides the page to that month, and the row moves with it as it does
-when the page is read down (Sam: "needs to smoothly move to next month when clicked").
-From more than a dozen screens away a glide would fetch every photograph it passes
-(102 of them, three megabytes, from January to October of 2026). So from that far the
-page cuts to one screen short of the month and glides the rest, which fetches 7, and
-the row, which cannot follow a cut, slides to the month by itself.
+A click on a name takes the row straight to it, and the page glides there (Sam: "needs
+to smoothly move to next month when clicked"). The name is in place and in ink within a
+third of a second, and the page arrives under it. From more than a dozen screens away a
+glide would fetch every photograph it passes (102 of them, three megabytes, from
+January to October of 2026). So from that far the page cuts to one screen short of the
+month and glides the rest, which fetches 7.
+
+The row is a strip that scrolls sideways, and once it is stuck the reader can move it
+too (Sam: "the ones to the left just kind of disappear so there no good way to naivgate
+there if youre on novenmber or something, swiping would be nice"). A swipe along it,
+one finger on a phone or two on a trackpad, brings back a month that has gone by, and a
+tap on its name goes there. Read on instead, and the row returns to the month the page
+is in.
 
 - The row is a picture of the headings, for the eye and the pointer. It is hidden from
   screen readers and the keyboard, which have the headings themselves (kept in place,
@@ -190,6 +197,15 @@ the row, which cannot follow a cut, slides to the month by itself.
 - The dozen screens is `far` in `app.html`: about half a megabyte of photographs passed
   on the way. About one month in six is longer than that (19 of 114 on a wide screen),
   so from the top of one of those the next month is a cut and a short glide.
+- The row is moved by scrolling it, not by a transform. That is what lets a swipe move
+  it, with the momentum and the ends a phone gives any strip. Its position is a whole
+  pixel (Safari drops the fraction of a scroll position), so a name stands within half a
+  pixel of its heading.
+- After a swipe the row is left alone for 0.8 seconds. Then the next movement of the
+  page puts it back at once. Easing it back is the next step if that reads as a jump.
+- At rest the row cannot be swiped: the one name showing is the first month's heading.
+- A mouse with no trackpad cannot swipe (shift and the wheel does it). Dragging with a
+  mouse is not built; the list of months on the title page is the other way back.
 
 ### Speed
 

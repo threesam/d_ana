@@ -23,7 +23,9 @@
 
 		     Months (a year page): the row of month names sticks to the top of the screen and
 		     follows the page. The month being read stands where its heading would. The next one
-		     draws nearer as the page is read down, and arrives as its own section does. -->
+		     draws nearer as the page is read down, and arrives as its own section does. The row
+		     is a strip that scrolls sideways, so a swipe along it brings back a month that has
+		     gone by, and a click on a name goes there. -->
 		<script>
 			{
 				const calm =
@@ -67,51 +69,72 @@
 
 				const run = document.querySelector('.run')
 				if (run) {
-					const track = run.querySelector('.ribbon ol')
-					const pane = track.parentElement
+					// the row: a strip of names that scrolls sideways, moved from here as the page moves
+					// and by the reader's own hand when they want a month that has gone by
+					const pane = run.querySelector('.window')
+					const track = pane.firstElementChild
 					const names = [...track.children]
 					const months = [...run.querySelectorAll('section')]
 					// where each name starts along the row, how wide it is, and how wide the column is
 					let starts, widths, column
 					const measure = () => {
+						const margin = parseFloat(getComputedStyle(track).paddingLeft)
 						starts = names.map((name) => name.offsetLeft - names[0].offsetLeft)
 						widths = names.map((name) => name.offsetWidth)
-						column = pane.clientWidth - 2 * parseFloat(getComputedStyle(pane).paddingLeft)
+						column = pane.clientWidth - 2 * margin
+						// room after the last name, so that it too can stand at the left of the column
+						track.style.paddingRight = `${pane.clientWidth - margin - widths.at(-1) + 1}px`
 						place()
 					}
-					let queued = 0
-					// the month a click is on its way to, while the row goes there by itself (see the click below)
-					let hop = -1
-					const place = () => {
-						queued = 0
-						const tops = months.map((month) => month.getBoundingClientRect().top)
-						// the month whose top has reached the top of the screen; none yet means the row is at rest
-						const reached = tops.findLastIndex((top) => top <= 0.5)
-						const now = hop < 0 ? Math.max(reached, 0) : hop
-						const next = Math.min(now + 1, names.length - 1)
-						// how far through this month the page is: 0 at its top, 1 where the next begins
-						const through =
-							hop >= 0 || reached < 0 || next === now
-								? 0
-								: Math.min(-tops[now] / (tops[next] - tops[now]), 1)
-						// The row moves all the way down the month, slowly at first and quickest at the end,
-						// so the name of the month being read stays readable for most of it.
-						const x = starts[now] + through ** 3 * (starts[next] - starts[now])
-						track.style.transform = `translateX(${-x}px)`
-						run.classList.toggle('stuck', reached >= 0)
+					// a name is as solid as the share of it that is inside the column
+					const fade = (x) =>
 						names.forEach((name, n) => {
-							name.classList.toggle('now', n === now)
-							// a name is as solid as the share of it that is inside the column
 							const from = starts[n] - x
 							const inside = Math.min(from + widths[n], column) - Math.max(from, 0)
 							name.firstElementChild.style.opacity = Math.max(0, Math.min(inside / widths[n], 1))
 						})
+					let queued = 0
+					// where this script last put the row, and when the reader last moved it themselves
+					let put = 0
+					let swiped = -Infinity
+					// the month a click is on its way to: the row goes straight there and is left alone
+					// until the page has arrived too
+					let hop = -1
+					const arrived = () => {
+						const top = months[hop].getBoundingClientRect().top
+						// (the page is there by the same measure `place` uses, or the name would lose its
+						// ink for the last frames of the way)
+						if (top <= 0.5 && top > -1 && Math.abs(pane.scrollLeft - starts[hop]) < 2) hop = -1
 					}
-					// A click on a month's name glides the page there (CSS) and the row goes with it, as it
-					// does when the page is read down. From far off, a glide would fetch every photograph it
-					// passes (three megabytes across a year). So from further than `far` screens the page
-					// cuts to one screen short of the month and glides the rest, and for that moment (`hop`)
-					// the row, which cannot follow a cut, slides straight to the month by itself.
+					const place = () => {
+						queued = 0
+						if (hop >= 0) arrived()
+						const tops = months.map((month) => month.getBoundingClientRect().top)
+						// the month whose top has reached the top of the screen; none yet means the row is at rest
+						const reached = tops.findLastIndex((top) => top <= 0.5)
+						const now = hop < 0 ? Math.max(reached, 0) : hop
+						run.classList.toggle('stuck', reached >= 0)
+						names.forEach((name, n) => name.classList.toggle('now', n === now))
+						// On its way to a click, or just swiped by the reader, the row is not this page's to
+						// move (at rest it always is: the one name showing is the first month's heading).
+						// ponytail: after a swipe it goes back to the page's month at once, the next time
+						// the page moves. Ease it back if that reads as a jump.
+						if (hop >= 0 || (reached >= 0 && performance.now() - swiped < 800)) return
+						const next = Math.min(now + 1, names.length - 1)
+						// how far through this month the page is: 0 at its top, 1 where the next begins
+						const through =
+							reached < 0 || next === now ? 0 : Math.min(-tops[now] / (tops[next] - tops[now]), 1)
+						// The row moves all the way down the month, slowly at first and quickest at the end,
+						// so the name of the month being read stays readable for most of it.
+						// (to a whole pixel: Safari drops the fraction of a scroll position, others round it)
+						put = Math.round(starts[now] + through ** 3 * (starts[next] - starts[now]))
+						pane.scrollLeft = put
+						fade(put)
+					}
+					// A click on a month's name: the row slides straight to it, and the page glides there
+					// (CSS). From far off, a glide would fetch every photograph it passes (three megabytes
+					// across a year), so from further than `far` screens the page first cuts to one screen
+					// short of the month and glides the rest.
 					// ponytail: a dozen screens is about half a megabyte of photographs; this is the knob
 					const far = 12
 					let landing
@@ -120,24 +143,36 @@
 						const link = e.target.closest('a[href^="#"]')
 						const to = link ? months.findIndex((month) => '#' + month.id === link.hash) : -1
 						// (with a key held the link opens somewhere else, and this page stays where it is)
-						if (to < 0 || calm || e.metaKey || e.ctrlKey || e.shiftKey) return
-						const top = months[to].getBoundingClientRect().top
-						if (Math.abs(top) <= far * innerHeight) return
+						if (to < 0 || e.metaKey || e.ctrlKey || e.shiftKey) return
 						hop = to
-						run.classList.add('hop')
+						put = starts[to]
+						pane.scrollTo({ left: put, behavior: calm ? 'instant' : 'smooth' })
 						clearTimeout(landing)
-						// long enough for the page to arrive: by then both agree on where the row stands
+						// if the page never gets there (the reader took over), the row follows the page again
 						landing = setTimeout(() => {
 							hop = -1
-							run.classList.remove('hop')
 							place()
-						}, 1200)
-						scrollBy({ top: top - Math.sign(top) * innerHeight, behavior: 'instant' })
+						}, 2000)
+						const top = months[to].getBoundingClientRect().top
+						if (!calm && Math.abs(top) > far * innerHeight)
+							scrollBy({ top: top - Math.sign(top) * innerHeight, behavior: 'instant' })
+						// the name takes its ink now, not when the page first moves
+						place()
 					})
 					run.classList.add('live')
 					addEventListener('scroll', () => (queued ||= requestAnimationFrame(place)), {
 						passive: true
 					})
+					// The row has moved. If this script did not put it there, the reader did.
+					pane.addEventListener(
+						'scroll',
+						() => {
+							if (hop >= 0) arrived()
+							else if (Math.abs(pane.scrollLeft - put) > 2) swiped = performance.now()
+							fade(pane.scrollLeft)
+						},
+						{ passive: true }
+					)
 					addEventListener('resize', measure)
 					// the names change width when the title face arrives
 					document.fonts.ready.then(measure)
