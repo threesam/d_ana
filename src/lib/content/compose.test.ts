@@ -8,7 +8,8 @@ const image = (key: string): Image => ({
 	alt: key,
 	width: 1080,
 	height: 1920,
-	tone: null
+	tone: null,
+	video: null
 })
 
 const piece = (handle: string, day: string, images: number, text: string | null = null): Piece => ({

@@ -8,5 +8,50 @@
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
+		<!-- The only script on the site. A video plays while it is on screen and stops when it
+		     leaves. A tap, Enter or Space stops one, and it then stays stopped until she starts it
+		     again. Someone who asked for less motion, or to save data, starts each one themselves. -->
+		<script>
+			{
+				const calm =
+					matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData
+				const play = (video) => {
+					video.muted = true
+					video.play().catch(() => {})
+				}
+				// `held`: stopped by hand, so coming back on screen does not start it again
+				const toggle = (video) => {
+					if (video.paused) {
+						delete video.dataset.held
+						play(video)
+					} else {
+						video.dataset.held = ''
+						video.pause()
+					}
+				}
+				// A video starts once it has stayed on screen for a moment, so a fast scroll down a year
+				// of them does not start (and download) every one it passes.
+				const waiting = new WeakMap()
+				const seen = new IntersectionObserver((entries) => {
+					for (const { target, isIntersecting } of entries) {
+						clearTimeout(waiting.get(target))
+						if (!isIntersecting) target.pause()
+						else if (!calm && !('held' in target.dataset))
+							waiting.set(
+								target,
+								setTimeout(() => play(target), 250)
+							)
+					}
+				})
+				for (const video of document.querySelectorAll('video')) seen.observe(video)
+				addEventListener('click', (e) => e.target instanceof HTMLVideoElement && toggle(e.target))
+				addEventListener('keydown', (e) => {
+					if (!(e.target instanceof HTMLVideoElement) || (e.key !== 'Enter' && e.key !== ' '))
+						return
+					e.preventDefault()
+					toggle(e.target)
+				})
+			}
+		</script>
 	</body>
 </html>

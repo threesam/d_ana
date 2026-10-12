@@ -35,9 +35,9 @@
 
 {#snippet caption(figure: Figure)}
 	<p class="mono muted">
-		<time datetime={figure.piece.day}>{dayLabel(figure.piece.day)}</time>{#if where(figure) !== ''}, {where(
-				figure
-			)}{/if}
+		<time datetime={figure.piece.day}>{dayLabel(figure.piece.day)}</time>{where(figure) === ''
+			? ''
+			: `, ${where(figure)}`}{figure.image.video === null ? '' : ', video'}
 	</p>
 	{#if figure.lead}
 		{@const others = unnamed(figure.piece.people, figure.piece.text)}
@@ -107,10 +107,11 @@
 	/* A photograph's box is worked out from its shape (--ratio, set by Photo), never from the
 	   file: with `width: auto` it was 0 by 0 until it loaded, and one run off the right edge
 	   never came into view, so it never loaded at all. */
-	.block :global(img) {
+	.block :global(.photo) {
 		display: block;
 		width: min(100%, calc(var(--tall) * var(--ratio)));
 		height: auto;
+		aspect-ratio: var(--ratio);
 	}
 
 	figcaption {
@@ -131,14 +132,14 @@
 	.bleed {
 		--tall: 92svh;
 	}
-	.bleed :global(img) {
+	.bleed :global(.photo) {
 		grid-row: 1;
 	}
 	.bleed figcaption {
 		grid-row: 1;
 		margin-top: clamp(24px, 8vw, 120px);
 	}
-	.bleed.right :global(img) {
+	.bleed.right :global(.photo) {
 		grid-column: 7 / -1;
 		justify-self: end;
 		margin-right: calc(-1 * var(--bleed));
@@ -146,7 +147,7 @@
 	.bleed.right figcaption {
 		grid-column: 1 / span 5;
 	}
-	.bleed.left :global(img) {
+	.bleed.left :global(.photo) {
 		grid-column: 1 / span 6;
 		justify-self: start;
 		margin-left: calc(-1 * var(--bleed));
@@ -201,11 +202,11 @@
 			grid-column: 1 / -1;
 			margin-top: 12px;
 		}
-		.bleed.right :global(img) {
+		.bleed.right :global(.photo) {
 			grid-column: 3 / -1;
 			margin-right: calc(-1 * var(--gutter));
 		}
-		.bleed.left :global(img) {
+		.bleed.left :global(.photo) {
 			grid-column: 1 / span 10;
 			margin-left: calc(-1 * var(--gutter));
 		}

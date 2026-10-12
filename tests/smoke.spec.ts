@@ -33,21 +33,22 @@ test('every photograph holds its place before it loads, and none is cut', async 
 	expect(empty).toBe(0)
 
 	// a photograph set to run off the edge must not be cut at the column: its outer edge is still it
-	const cut = await page.locator('main .bleed img').evaluateAll(
-		(images) =>
-			images.slice(0, 6).filter((image) => {
-				image.scrollIntoView({ block: 'center' })
-				const box = image.getBoundingClientRect()
+	const cut = await page.locator('main .bleed .photo').evaluateAll(
+		(photos) =>
+			photos.slice(0, 6).filter((photo) => {
+				photo.scrollIntoView({ block: 'center' })
+				const box = photo.getBoundingClientRect()
 				const outer = box.left < innerWidth - box.right ? box.left + 3 : box.right - 3
-				return document.elementFromPoint(outer, innerHeight / 2) !== image
+				return !photo.contains(document.elementFromPoint(outer, innerHeight / 2))
 			}).length
 	)
 	expect(cut).toBe(0)
 })
 
-test('pages are static: no script is shipped', async ({ page }) => {
+test('pages are static: the only script is the few lines that play a video', async ({ page }) => {
 	await page.goto('/')
-	await expect(page.locator('script')).toHaveCount(0)
+	await expect(page.locator('script[src], link[rel="modulepreload"]')).toHaveCount(0)
+	await expect(page.locator('script')).toHaveCount(1)
 })
 
 test('the skip link moves focus into the page', async ({ page }) => {

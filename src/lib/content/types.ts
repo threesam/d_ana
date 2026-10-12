@@ -8,6 +8,8 @@ export interface Image {
 	height: number
 	/** The photograph's own dominant colour, shown until it loads. */
 	tone: string | null
+	/** A video's address. When set, the photograph is the still shown until it plays. */
+	video: string | null
 }
 
 export interface Place {

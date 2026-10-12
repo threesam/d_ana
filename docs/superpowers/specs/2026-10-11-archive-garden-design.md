@@ -143,7 +143,12 @@ a place. Never a street.
   ladder (320 to 1920, never wider than the photograph), `fit=max`, quality 75.
 - Every `<img>` has `srcset`, `sizes`, `width`, `height`, `loading="lazy"` and
   `decoding="async"`. The first image on a page loads eagerly with high priority.
-- Pages ship no JavaScript at all (`csr = false`): nothing on them moves.
+- Pages ship no framework JavaScript (`csr = false`). The one thing that moves is a video:
+  it plays, without sound or controls, while it is on screen and stops when it leaves
+  (Sam, 2026-10-11). A tap, Enter or Space stops one and it stays stopped. Someone who
+  asked for less motion or to save data starts each one themselves. That is the one
+  inline script.
+- A video is a photograph with a `video` file attached. The photograph is the still.
 - Each photograph's own dominant colour (from Sanity's metadata) is the background
   until it arrives, and `width` and `height` hold its place, so nothing jumps. The
   blurred preview (LQIP) was left out: at about 1 KB each it would add 400 KB of

@@ -20,7 +20,8 @@ const IMAGE = `{
 	"alt": coalesce(alt, ""),
 	"width": asset->metadata.dimensions.width,
 	"height": asset->metadata.dimensions.height,
-	"tone": asset->metadata.palette.dominant.background
+	"tone": asset->metadata.palette.dominant.background,
+	"video": coalesce(video.asset->url, null)
 }`
 
 const PIECE = `{

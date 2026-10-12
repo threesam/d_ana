@@ -23,8 +23,10 @@ The site is her archive: every post and story she made, a page per year.
 Design and content model: `docs/superpowers/specs/2026-10-11-archive-garden-design.md`.
 
 - `src/routes/+layout.server.ts` — `prerender = true` and `csr = false` for the
-  whole site: static HTML, no JavaScript shipped. Keep it that way; anything that
-  needs script or a server (the future edit mode) opts out per route.
+  whole site: static HTML, no framework JavaScript shipped. The one script is a few
+  inline lines in `src/app.html` that play a video while it is on screen. Keep it
+  that way; anything that needs more script or a server (the future edit mode)
+  opts out per route.
 - `src/routes/+page.*` — home: the title page and the index of years and themes.
 - `src/routes/[year=year]/` — a year, month by month. `src/params.ts` holds the
   `year` matcher, so `/2019` is a year and anything else 404s.
