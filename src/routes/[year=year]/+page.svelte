@@ -173,6 +173,14 @@
 	.ribbon li:global(.now) a {
 		color: var(--color-ink);
 	}
+	/* A click on a month many screens away cuts most of the way there (the script says why). For
+	   that moment (`hop`) the row is not tied to the page: it slides straight to the month. */
+	.run:global(.hop) .ribbon ol {
+		transition: transform 0.7s cubic-bezier(0.3, 0, 0.2, 1);
+	}
+	.run:global(.hop) .ribbon a {
+		transition: opacity 0.7s;
+	}
 	@media (prefers-reduced-motion: reduce) {
 		.ribbon li,
 		.run:global(.stuck) .ribbon li {

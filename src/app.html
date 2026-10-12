@@ -80,16 +80,20 @@
 						place()
 					}
 					let queued = 0
+					// the month a click is on its way to, while the row goes there by itself (see the click below)
+					let hop = -1
 					const place = () => {
 						queued = 0
 						const tops = months.map((month) => month.getBoundingClientRect().top)
 						// the month whose top has reached the top of the screen; none yet means the row is at rest
 						const reached = tops.findLastIndex((top) => top <= 0.5)
-						const now = Math.max(reached, 0)
+						const now = hop < 0 ? Math.max(reached, 0) : hop
 						const next = Math.min(now + 1, names.length - 1)
 						// how far through this month the page is: 0 at its top, 1 where the next begins
 						const through =
-							reached < 0 || next === now ? 0 : Math.min(-tops[now] / (tops[next] - tops[now]), 1)
+							hop >= 0 || reached < 0 || next === now
+								? 0
+								: Math.min(-tops[now] / (tops[next] - tops[now]), 1)
 						// The row moves all the way down the month, slowly at first and quickest at the end,
 						// so the name of the month being read stays readable for most of it.
 						const x = starts[now] + through ** 3 * (starts[next] - starts[now])
@@ -103,15 +107,32 @@
 							name.firstElementChild.style.opacity = Math.max(0, Math.min(inside / widths[n], 1))
 						})
 					}
-					// A jump to a month glides there (CSS). From far off the glide would run through every
-					// month on the way, fetching photographs nobody stops at, so then it goes straight there.
+					// A click on a month's name glides the page there (CSS) and the row goes with it, as it
+					// does when the page is read down. From far off, a glide would fetch every photograph it
+					// passes (three megabytes across a year). So from further than `far` screens the page
+					// cuts to one screen short of the month and glides the rest, and for that moment (`hop`)
+					// the row, which cannot follow a cut, slides straight to the month by itself.
+					// ponytail: a dozen screens is about half a megabyte of photographs; this is the knob
+					const far = 12
+					let landing
+					if (calm) document.documentElement.style.scrollBehavior = 'auto'
 					addEventListener('click', (e) => {
 						const link = e.target.closest('a[href^="#"]')
-						const month = link && document.getElementById(link.hash.slice(1))
-						if (!month || Math.abs(month.getBoundingClientRect().top) < innerHeight * 2) return
-						const root = document.documentElement
-						root.style.scrollBehavior = 'auto'
-						setTimeout(() => (root.style.scrollBehavior = ''))
+						const to = link ? months.findIndex((month) => '#' + month.id === link.hash) : -1
+						// (with a key held the link opens somewhere else, and this page stays where it is)
+						if (to < 0 || calm || e.metaKey || e.ctrlKey || e.shiftKey) return
+						const top = months[to].getBoundingClientRect().top
+						if (Math.abs(top) <= far * innerHeight) return
+						hop = to
+						run.classList.add('hop')
+						clearTimeout(landing)
+						// long enough for the page to arrive: by then both agree on where the row stands
+						landing = setTimeout(() => {
+							hop = -1
+							run.classList.remove('hop')
+							place()
+						}, 1200)
+						scrollBy({ top: top - Math.sign(top) * innerHeight, behavior: 'instant' })
 					})
 					run.classList.add('live')
 					addEventListener('scroll', () => (queued ||= requestAnimationFrame(place)), {

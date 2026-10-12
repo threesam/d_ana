@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test'
 
+declare global {
+	interface Window {
+		/** every place the page has scrolled through (the months test tells a glide from a cut by it) */
+		trail: number[]
+	}
+}
+
 test('home lists the years and a year shows described photographs', async ({ page }) => {
 	await page.goto('/')
 	await expect(page.getByRole('heading', { level: 1, name: 'd-ana' })).toBeVisible()
@@ -52,7 +59,7 @@ test('pages are static: the only script is a few lines of its own', async ({ pag
 	await expect(page.locator('script:not([type="speculationrules"])')).toHaveCount(1)
 })
 
-test('the row of months sticks, follows the page, and a click goes to that month', async ({
+test('the row of months sticks, follows the page, and a click glides to that month', async ({
 	page
 }) => {
 	await page.setViewportSize({ width: 1280, height: 800 })
@@ -79,19 +86,49 @@ test('the row of months sticks, follows the page, and a click goes to that month
 	await expect.poll(async () => Math.abs((await left(1)) - column)).toBeLessThan(1)
 	await expect(page.locator('.run')).toHaveClass(/stuck/)
 
-	// a click on the next name brings that month to the top, and its name into place
+	// From here on, keep every place the page scrolls through. `passed` waits for the page to
+	// settle, then hands them over and starts again.
+	await page.evaluate(() => {
+		window.trail = []
+		addEventListener('scroll', () => window.trail.push(scrollY))
+	})
+	const passed = () =>
+		page.evaluate(async () => {
+			await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+			const trail = window.trail.splice(0)
+			return { places: trail.length, first: trail[0] ?? NaN, at: scrollY }
+		})
+
+	// A click on a name six screens off (a month away, as months go) glides there: the page sets
+	// off from where it was, passes through the way, and the month and its name arrive together.
+	await months.nth(2).evaluate((month) => {
+		scrollBy({ top: month.getBoundingClientRect().top - 6 * innerHeight, behavior: 'instant' })
+	})
+	const { at: start } = await passed()
 	await names.nth(2).locator('a').click()
 	await expect.poll(async () => Math.abs(await top(2))).toBeLessThan(1)
 	await expect.poll(async () => Math.abs((await left(2)) - column)).toBeLessThan(1)
+	const glide = await passed()
+	expect(glide.places).toBeGreaterThan(3)
+	expect(glide.first - start).toBeLessThan(400)
 
-	// from the list at the top of the page, the last month is far: it still lands exactly
+	// From the list at the top of the page the last month is many screens off. The page cuts to
+	// one screen short of it and glides the rest, the row slides there by itself, and both
+	// land exactly.
 	await page.evaluate(() => {
 		scrollTo({ top: 0, behavior: 'instant' })
 	})
-	await page.locator('nav.months a').last().click()
 	const last = (await months.count()) - 1
+	expect(await top(last)).toBeGreaterThan(12 * 800)
+	await passed()
+	await page.locator('nav.months a').last().click()
 	await expect.poll(async () => Math.abs(await top(last))).toBeLessThan(1)
 	await expect.poll(async () => Math.abs((await left(last)) - column)).toBeLessThan(1)
+	const hop = await passed()
+	expect(hop.places).toBeGreaterThan(3)
+	expect(hop.at - hop.first).toBeLessThanOrEqual(801)
+	// and then the row is tied to the page again
+	await expect(page.locator('.run')).not.toHaveClass(/hop/)
 })
 
 test('the type faces load and nothing the page asks for is missing', async ({ page }) => {

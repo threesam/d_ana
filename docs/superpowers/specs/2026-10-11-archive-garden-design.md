@@ -172,8 +172,14 @@ reaches the top of the screen only its name shows, as that month's heading. Then
 sticks and the other names arrive one after another. Reading down, the row slides so the
 next month draws nearer, slowly at first and quickest at the end, and that name arrives
 in the heading's place exactly as its own section does. A name fades as it leaves the
-column on either side. A click on a name goes to that month: a glide when it is near,
-straight there when it is far.
+column on either side.
+
+A click on a name glides the page to that month, and the row moves with it as it does
+when the page is read down (Sam: "needs to smoothly move to next month when clicked").
+From more than a dozen screens away a glide would fetch every photograph it passes
+(102 of them, three megabytes, from January to October of 2026). So from that far the
+page cuts to one screen short of the month and glides the rest, which fetches 7, and
+the row, which cannot follow a cut, slides to the month by itself.
 
 - The row is a picture of the headings, for the eye and the pointer. It is hidden from
   screen readers and the keyboard, which have the headings themselves (kept in place,
@@ -181,6 +187,9 @@ straight there when it is far.
 - Without the script the row is not there and the headings are drawn as usual.
 - The travel is eased (the cube of how far through the month the page is). Linear is
   one character away in `app.html` if the name should leave sooner.
+- The dozen screens is `far` in `app.html`: about half a megabyte of photographs passed
+  on the way. About one month in six is longer than that (19 of 114 on a wide screen),
+  so from the top of one of those the next month is a cut and a short glide.
 
 ### Speed
 
