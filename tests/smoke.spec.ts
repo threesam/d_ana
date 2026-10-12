@@ -20,6 +20,16 @@ test('home lists the years and a year shows described photographs', async ({ pag
 	await expect(page.locator('main img:not([alt]), main img[alt=""]')).toHaveCount(0)
 })
 
+test('the foot of every page says where else she is', async ({ page }) => {
+	for (const path of ['/', '/places']) {
+		await page.goto(path)
+		const elsewhere = page.locator('footer nav a')
+		await expect(elsewhere).toHaveCount(2)
+		await expect(elsewhere.nth(0)).toHaveAttribute('href', 'https://www.instagram.com/__d_ana___')
+		await expect(elsewhere.nth(1)).toHaveAttribute('href', 'https://tiktok.com/@d_ana___')
+	}
+})
+
 test('on the home page a year is grey until it is pointed at or reached with Tab', async ({
 	page
 }) => {

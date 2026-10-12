@@ -27,6 +27,11 @@
 <footer class="wrap mono muted">
 	<span>d-ana</span>
 	<span>Photographs and words, kept in one place.</span>
+	<!-- where else she is: the two links her site has always carried -->
+	<nav aria-label="Elsewhere">
+		<a href="https://www.instagram.com/__d_ana___" rel="me noopener">Instagram</a>
+		<a href="https://tiktok.com/@d_ana___" rel="me noopener">TikTok</a>
+	</nav>
 </footer>
 
 <style>
@@ -69,5 +74,14 @@
 		margin-top: clamp(96px, 14vw, 200px);
 		padding-block: 24px 40px;
 		border-top: 1px solid var(--color-ink);
+	}
+	footer nav {
+		display: flex;
+		gap: 24px;
+	}
+	footer a {
+		/* tall enough for a thumb */
+		padding-block: 6px;
+		margin-block: -6px;
 	}
 </style>
