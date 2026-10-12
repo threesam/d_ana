@@ -20,6 +20,25 @@ test('home lists the years and a year shows described photographs', async ({ pag
 	await expect(page.locator('main img:not([alt]), main img[alt=""]')).toHaveCount(0)
 })
 
+test('on the home page a year is grey until it is pointed at or reached with Tab', async ({
+	page
+}) => {
+	await page.goto('/')
+	const first = page.locator('a.year').first().locator('.strip')
+	const second = page.locator('a.year').nth(1).locator('.strip')
+	await expect(first).toHaveCSS('filter', 'grayscale(1)')
+	await page.locator('a.year').first().hover()
+	await expect(first).toHaveCSS('filter', 'none')
+	await expect(second).toHaveCSS('filter', 'grayscale(1)')
+	// the pointer goes away, and the keyboard reaches the second year
+	await page.mouse.move(0, 0)
+	await expect(first).toHaveCSS('filter', 'grayscale(1)')
+	await page.locator('a.year').nth(1).focus()
+	await page.keyboard.press('Shift+Tab')
+	await page.keyboard.press('Tab')
+	await expect(second).toHaveCSS('filter', 'none')
+})
+
 test('every photograph holds its place before it loads, and none is cut', async ({ page }) => {
 	// no image file ever arrives, so a box can only come from the page itself. A box of nothing
 	// at the right edge is never "in view", so the browser never fetches that photograph.

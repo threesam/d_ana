@@ -100,6 +100,35 @@
 		align-items: flex-end;
 		gap: 12px;
 		min-width: 0;
+		/* The frames beside a year are grey until that year is pointed at, pressed, or reached
+		   with the Tab key (Sam, 2026-10-11): the page is type first, and one year has colour. */
+		filter: grayscale(1);
+		transition: filter 0.3s;
+	}
+	.year:is(:hover, :focus-visible, :active) .strip {
+		filter: none;
+	}
+	/* Nothing hovers on a phone, so there the year passing the middle of the screen is the one
+	   in colour. A browser that cannot tie a style to the scroll keeps them grey until pressed. */
+	@media (hover: none) {
+		@supports (animation-timeline: view()) {
+			.strip {
+				animation: lit linear both;
+				animation-timeline: view();
+			}
+		}
+	}
+	@keyframes lit {
+		0%,
+		25%,
+		75%,
+		100% {
+			filter: grayscale(1);
+		}
+		35%,
+		65% {
+			filter: none;
+		}
 	}
 	.strip :global(img) {
 		width: auto;

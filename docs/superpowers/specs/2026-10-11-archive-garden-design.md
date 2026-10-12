@@ -120,6 +120,12 @@ month the photographs run in order with a date under each.
 The footer is a colophon: her name, the two social links, the year. No navigation
 bar beyond the wordmark and the list of years.
 
+On the home page the frames beside a year are grey until that year is pointed at, pressed
+or reached with the Tab key (Sam, 2026-10-11: "on hp i want grascale and on hover of
+year the images get color"). Nothing hovers on a phone, so there the year passing the
+middle of the screen is the one in colour, by a scroll-driven style and no script. A
+browser without that keeps them grey until a year is pressed.
+
 ### Composition
 
 The site composes and she never places. Photographs take their layout from how many
