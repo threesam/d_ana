@@ -140,7 +140,22 @@ desktop. Keep it there:
   is an ordinary lazy `<img>` under it).
 - **Measure before and after** any change to layout, images or fonts:
   `pnpm build && pnpm preview`, then Lighthouse with `--form-factor=mobile` and with
-  `--preset=desktop` on `/`, a full year, a theme and `/places`.
+  `--preset=desktop` on `/`, a full year, a theme and `/places`. Run it with nothing
+  else busy on the machine: a build or a test run alongside costs points.
+- **On the real host, measure a Vercel preview like this**, or it reads worse than
+  production will:
+  `--extra-headers='{"x-vercel-skip-toolbar":"1"}'` and
+  `--chrome-flags="--headless=new --disable-features=Translate,OptimizationHints,MediaRouter,DialMediaRouteProvider,CalculateNativeWinOcclusion,InterestFeedContentSuggestions,CertificateTransparencyComponentUpdater,AutofillServerCommunication,PrivacySandboxSettings4"`.
+  Three things skew a preview. Vercel adds its toolbar script (previews only). It also
+  sends `x-robots-tag: noindex` (previews only), so SEO cannot be 100 there. And the
+  Lighthouse CLI's own launcher switches off Chrome's `RenderDocument`, which no
+  visitor's Chrome does: with it off, Chrome holds this site's first paint for a second
+  or two on most runs (1.3 s against 0.3 s). The list above is the launcher's own, minus
+  that one.
+- **Real host, 2026-10-12:** desktop 100 on all five pages. Phone 100 on 2024, a theme
+  and places, and 98 on home and on 2018. What is left: a type face that lands before
+  the first paint is counted against it (home), and the faces arriving after it lay the
+  longest year out a second time (2018). Both are about how the faces load.
 
 ## Counting
 

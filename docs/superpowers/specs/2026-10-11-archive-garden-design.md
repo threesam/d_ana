@@ -232,6 +232,9 @@ once, with `useCdn: false` so a rebuild always sees what was just changed.
 - In Chrome, hovering or pressing a link gets the next page ready (speculation rules).
 - Lighthouse, phone and desktop, on home, two years, a theme and places: 100 in all
   four categories is the bar. AGENTS.md says how to measure.
+- A local build meets it. The first measurements on Vercel's own host (2026-10-12, the
+  first day a preview could be built) are 100 on desktop and 98 to 100 on a phone. Open:
+  how the type faces load, which is what the last two points on a phone turn on.
 
 ### Getting around
 
