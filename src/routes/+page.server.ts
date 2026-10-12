@@ -7,7 +7,7 @@ import type { PageServerLoad } from './$types'
 export const prerender = true
 
 export const load: PageServerLoad = async () => {
-	const posts = await client.fetch<Post[]>(`*[_type == 'post']{
+	const posts = await client.fetch<Post[]>(`*[_type == 'post' && defined(slug.current)]{
 		...,
 		image{
 			...,
