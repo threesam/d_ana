@@ -1,6 +1,6 @@
 # AGENTS.md — d-ana
 
-Deana's personal site, **https://d-ana.com**. SvelteKit (Svelte 5, runes) +
+Deana's personal site, **https://d-ana.com**. SvelteKit 3 (Svelte 5, runes) +
 Tailwind v4, content from Sanity, deployed on Vercel.
 
 ## Where everything lives
@@ -19,16 +19,30 @@ they are public identifiers, not secrets.
 
 ## Layout
 
-- `src/routes/+layout.server.ts` — site settings (GROQ), prerendered.
-- `src/routes/+page.*` — home (hero video, gallery, bio, thoughts list).
-- `src/routes/thoughts/[handle]/+page.*` — a post; unknown handles 404.
-- `src/lib/utils/sanity.ts` — Sanity client + `urlFor` image helper.
-- `src/lib/types.ts` — shapes of the GROQ projections the templates read.
-- `src/routes/styles.css` — Tailwind v4 `@theme` + global/Portable Text styles
-  (includes a small v3-parity block; don't drop it without a visual pass).
+The site is her archive: every post and story she made, a page per year.
+Design and content model: `docs/superpowers/specs/2026-10-11-archive-garden-design.md`.
+
+- `src/routes/+layout.server.ts` — `prerender = true` and `csr = false` for the
+  whole site: static HTML, no JavaScript shipped. Keep it that way; anything that
+  needs script or a server (the future edit mode) opts out per route.
+- `src/routes/+page.*` — home: the title page and the index of years and themes.
+- `src/routes/[year=year]/` — a year, month by month. `src/params.ts` holds the
+  `year` matcher, so `/2019` is a year and anything else 404s.
+- `src/routes/theme/[handle]/` — one theme across years. `src/routes/places/` — the map.
+- `src/lib/content/` — pure logic, unit tested: `compose.ts` (which layout each
+  photograph gets), `image.ts` (the Sanity CDN `srcset` ladder), `places.ts` (the
+  dot map), `index.ts` (year summaries, date labels), `types.ts`.
+- `src/lib/server/content.ts` — the Sanity client and every GROQ query. Server
+  only. Every query filters on `visibility == "shown"`; never add one that doesn't.
+- `src/lib/components/` — `Photo.svelte` (the only `<img>`: `srcset`, `sizes`,
+  lazy loading, intrinsic size) and `Blocks.svelte` (Bleed, Stagger pair, Title page).
+- `src/routes/styles.css` — tokens (four colours, three typefaces) and the few
+  shared classes. Layout CSS lives with its component.
 
 Every route is prerendered at build time, so `pnpm build` fetches live content
-from the public dataset.
+from the public dataset. The public dataset holds only pieces cleared to be seen;
+new work lands in a private dataset first and is copied over once tagged. The site
+never needs a token.
 
 ## Code style
 
@@ -82,12 +96,16 @@ MCP (`svelte` server), not memory:
   changed, fix what it reports, and re-run until it comes back clean. Do this
   before `pnpm check`, not instead of it.
 
-## Visual parity
+## Visual pass
 
-Site work ends with a visual pass against prod (https://d-ana.com): run
-`pnpm build && pnpm preview` and compare home + a `/thoughts/<handle>` page at
-desktop and mobile widths. A config-only / upgrade PR must render
-pixel-identical.
+Site work ends with a look at the real thing: `pnpm build && pnpm preview`, then
+home, a full year and `/places` at desktop (1440) and phone (390) widths. Check
+that nothing scrolls sideways, every photograph has its place held before it
+loads, and Lighthouse accessibility is 100.
+
+Design rules that are decisions, not taste to revisit: white page, black type, no
+colour except the photographs; IM Fell English, Spectral and IBM Plex Mono;
+nothing moves; no dark theme; no em dashes in copy.
 
 ## Conventions
 

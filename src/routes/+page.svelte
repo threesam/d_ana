@@ -1,125 +1,150 @@
 <script lang="ts">
-	import PortableText from '#lib/components/PortableText.svelte'
-	import SEO from 'svelte-seo'
-	import video from '#lib/assets/videos/sample.mp4'
-	import Play from '#lib/components/icons/Play.svelte'
-	import Pause from '#lib/components/icons/Pause.svelte'
-	import BioBlock from '#lib/components/BioBlock.svelte'
-	import { urlFor } from '#lib/utils/sanity.ts'
+	import Photo from '#lib/components/Photo.svelte'
 	import type { PageProps } from './$types'
 
 	let { data }: PageProps = $props()
-	const { founder, title, description } = $derived(data.settings)
 
-	let isPaused = $state(false)
-	let videoElement: HTMLVideoElement | undefined = $state()
-
-	function play(node: HTMLVideoElement) {
-		if (!isPaused) {
-			void node.play()
-		}
-	}
-
-	function handlePlayPauseClick() {
-		isPaused = !isPaused
-		if (!isPaused) {
-			void videoElement?.play()
-		} else {
-			videoElement?.pause()
-		}
-	}
+	const from = $derived(data.years.at(-1)?.year)
+	const to = $derived(data.years[0]?.year)
 </script>
 
-<SEO
-	{title}
-	{description}
-	openGraph={{
-		title,
-		description,
-		type: 'website',
-		images: [{ url: founder.image.asset.url }]
-	}}
-/>
+<svelte:head>
+	<title>d-ana</title>
+	<meta name="description" content="Photographs and notes by d-ana, kept year by year." />
+</svelte:head>
 
-<div class="relative aspect-video w-full pt-20 pb-32 lg:px-10">
-	<div class="relative overflow-hidden">
-		<video
-			class="w-full"
-			muted
-			loop
-			autoplay
-			playsinline
-			id="hero-video"
-			src={video}
-			bind:this={videoElement}
-			use:play
-		></video>
-		<button
-			class="absolute inset-0 text-white opacity-0 transition-opacity duration-300 hover:opacity-100 focus-visible:opacity-100"
-			onclick={handlePlayPauseClick}
-		>
-			<span class="absolute bottom-5 left-5 lg:bottom-10 lg:left-10">
-				<!-- Labels live inside the {#if}: a reactive attribute on this template would share
-				     its update effect with the video's src and restart the video on every toggle. -->
-				{#if isPaused}
-					<Play width={50} height={50} />
-					<span class="sr-only">Play video</span>
-				{:else}
-					<Pause width={50} height={50} />
-					<span class="sr-only">Pause video</span>
-				{/if}</span
-			>
-		</button>
-	</div>
-</div>
-
-<section class="grid grid-cols-2 bg-gray-100 py-32 lg:grid-cols-4 lg:gap-10 lg:px-10">
-	{#each founder.imageGallery as image, i (i)}
-		{@const img = urlFor(image).auto('format')}
-		<!-- alt comes from the Studio; without it the photo is decorative (filenames like IMG_6368.JPG aren't alt text) -->
-		<img
-			class="aspect-square h-full w-full object-cover"
-			src={img.width(800).url()}
-			srcset="{img.width(600).url()} 600w, {img.width(1200).url()} 1200w"
-			sizes="(min-width: 1024px) 25vw, 50vw"
-			alt={image.alt ?? ''}
-		/>
-	{/each}
+<section class="wrap title-page">
+	<h1>d-ana</h1>
+	{#if from !== undefined && to !== undefined}
+		<p class="lede">Photographs and notes, {from} to {to}.</p>
+	{/if}
 </section>
 
-<section class="grid grid-cols-1 gap-10 px-5 py-32 lg:grid-cols-2 lg:px-10">
-	<img
-		class="ring-2 ring-black"
-		src={urlFor(founder.image.asset).auto('format').url()}
-		width={founder.image.asset.metadata.dimensions.width}
-		height={founder.image.asset.metadata.dimensions.height}
-		alt="d-ana's face"
-		loading="lazy"
-	/>
-	<div class="flex flex-col gap-5 text-xl">
-		<h1 class="text-5xl">I'm {founder.name}.</h1>
-		<PortableText blocks={founder.bio} components={{ block: BioBlock }} />
-	</div>
-</section>
-
-<section class="flex w-full flex-col bg-gray-100 px-5 py-32 lg:px-10">
-	<h2 class="mb-2 text-3xl">Thoughts</h2>
-	<div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
-		{#each data.posts as post (post._id)}
-			<div class="mb-5">
-				<img
-					class="mb-2 ring-2 ring-black"
-					src={urlFor(post.image.asset).auto('format').url()}
-					width={post.image.asset.metadata.dimensions.width}
-					height={post.image.asset.metadata.dimensions.height}
-					alt={post.title}
-					loading="lazy"
-				/>
-				<h3>{post.title}</h3>
-				<a class="text-sm underline underline-offset-2" href={'/thoughts/' + post.slug.current}
-					>read more<span class="sr-only">: {post.title}</span></a
-				>
-			</div>
+<section class="wrap" aria-labelledby="years-heading">
+	<h2 id="years-heading" class="sr-only">Years</h2>
+	{#if data.years.length === 0}
+		<p>Nothing is here yet.</p>
+	{/if}
+	<ol class="years">
+		{#each data.years as year, i (year.year)}
+			<li>
+				<a class="year" href="/{year.year}">
+					<span class="numeral">{year.year}</span>
+					<span class="mono muted count">{year.count} {year.count === 1 ? 'piece' : 'pieces'}</span>
+					{#if year.intro}
+						<span class="intro">{year.intro}</span>
+					{/if}
+					<span class="strip">
+						{#each year.frames as frame (frame.key)}
+							<Photo
+								image={frame}
+								sizes="(min-width: 860px) 300px, 150px"
+								eager={i === 0}
+								decorative
+							/>
+						{/each}
+					</span>
+				</a>
+			</li>
 		{/each}
-	</div>
+	</ol>
 </section>
+
+{#if data.themes.length > 0}
+	<section class="wrap themes" aria-labelledby="themes-heading">
+		<h2 id="themes-heading">Themes</h2>
+		<ul>
+			{#each data.themes as theme (theme.handle)}
+				<li>
+					<a href="/theme/{theme.handle}">{theme.title}</a>
+					<span class="mono muted">{theme.count}</span>
+				</li>
+			{/each}
+		</ul>
+	</section>
+{/if}
+
+<style>
+	.year {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		column-gap: 24px;
+		row-gap: 8px;
+		align-items: end;
+		padding-block: 36px;
+		border-top: 1px solid var(--color-rule);
+		text-decoration-line: none;
+	}
+	.years li:first-child .year {
+		border-top-color: var(--color-ink);
+	}
+	.numeral {
+		grid-column: 1 / span 4;
+		font: 400 clamp(56px, 8vw, 120px) / 0.9 var(--font-title);
+		letter-spacing: -0.01em;
+	}
+	.year:hover .numeral {
+		text-decoration: underline 2px;
+		text-underline-offset: 8px;
+	}
+	.count {
+		grid-column: 1 / span 4;
+	}
+	.intro {
+		grid-column: 1 / span 4;
+		max-width: 36ch;
+		font-size: 17px;
+		line-height: 1.5;
+	}
+	.strip {
+		grid-column: 5 / -1;
+		grid-row: 1 / span 3;
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-end;
+		gap: 12px;
+		min-width: 0;
+	}
+	.strip :global(img) {
+		width: auto;
+		height: clamp(96px, 13vw, 184px);
+		min-width: 0;
+		object-fit: cover;
+	}
+
+	.themes {
+		margin-top: clamp(72px, 10vw, 144px);
+	}
+	.themes h2 {
+		font-size: 28px;
+		line-height: 1.1;
+	}
+	.themes ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 36px;
+		margin-top: 20px;
+		max-width: 1000px;
+	}
+	.themes a {
+		font: italic 400 clamp(24px, 3vw, 36px) / 1.2 var(--font-title);
+	}
+
+	@media (max-width: 859px) {
+		.year {
+			column-gap: 12px;
+			padding-block: 28px;
+		}
+		.numeral,
+		.count,
+		.intro {
+			grid-column: 1 / -1;
+		}
+		.strip {
+			grid-column: 1 / -1;
+			grid-row: auto;
+			justify-content: flex-start;
+			margin-top: 12px;
+		}
+	}
+</style>

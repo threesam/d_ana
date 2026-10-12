@@ -1,28 +1,4 @@
-import type { SiteSettings } from '#lib/types.ts'
-import { client } from '#lib/utils/sanity.ts'
-import type { LayoutServerLoad } from './$types'
-
-// since there's no dynamic data here, we can prerender
-// it so that it gets served as a static asset in production
+// Every page is the same for everyone and nothing on it moves, so the whole site is
+// written to HTML at build time and ships no JavaScript.
 export const prerender = true
-
-export const load: LayoutServerLoad = async () => {
-	const settings = await client.fetch<SiteSettings>(`*[_type == 'siteSettings'][0]{
-		...,
-		founder->{
-			...,
-			image{
-				...,
-				asset->
-			},
-			imageGallery[]{
-				...asset->,
-				alt
-			},
-		}
-	}`)
-
-	return {
-		settings
-	}
-}
+export const csr = false

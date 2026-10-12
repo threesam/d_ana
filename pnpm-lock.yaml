@@ -8,18 +8,21 @@ importers:
 
   .:
     dependencies:
-      '@portabletext/svelte':
-        specifier: 4.0.0
-        version: 4.0.0(svelte@5.57.2(@typescript-eslint/types@8.71.1))
+      '@fontsource/ibm-plex-mono':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/im-fell-english':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/spectral':
+        specifier: 5.3.0
+        version: 5.3.0
       '@sanity/client':
         specifier: 8.9.0
         version: 8.9.0(vitest@5.0.3(@types/node@26.6.5)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)))
       '@sanity/image-url':
         specifier: 2.1.1
         version: 2.1.1
-      svelte-seo:
-        specifier: 2.0.0
-        version: 2.0.0(svelte@5.57.2(@typescript-eslint/types@8.71.1))
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1
@@ -282,6 +285,15 @@ packages:
     resolution: {integrity: sha512-IkO+/KEUvwbVpiURZg+P7zF74z5Jxe0UgJxVni+RtoHQ6IZieXaO02kmadomap/q+l6bc/jdPGGqTjhuZnuz1Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
+  '@fontsource/ibm-plex-mono@5.3.0':
+    resolution: {integrity: sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==}
+
+  '@fontsource/im-fell-english@5.3.0':
+    resolution: {integrity: sha512-FcgdWfY9WeUM2gQkfmwhn4Ed9LVtlll8LSSZvHfbsUrnHK5tHHnGg6BgwAfHogp52adU3eE89J/3B52qV3b+Vw==}
+
+  '@fontsource/spectral@5.3.0':
+    resolution: {integrity: sha512-2TL5WWGOZj4SIsBmPFEzKeA60tXXd1Qp1OqaaVEWkJL8IfSGLk6YmiusmC441iFkdJDIuFelu1r8lhCmQUU3mw==}
+
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
     engines: {node: '>=18.18.0'}
@@ -353,20 +365,6 @@ packages:
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
-
-  '@portabletext/svelte@4.0.0':
-    resolution: {integrity: sha512-16i4R82pEKGKBCs9zNRgb0EChU5f7e+1dSXtiIQgveVOLuMrBEby9GRhVTcCQcnfsx86HaJ5DbFM4o5lIPUjww==}
-    engines: {node: '>=22.12'}
-    peerDependencies:
-      svelte: ^5.0.0
-
-  '@portabletext/toolkit@6.0.0':
-    resolution: {integrity: sha512-+qSqe0KnefuZfNLUhzQRTpbSKxslZof+3pNwxg0DC8dfZ1yLKyyBUw6iR7EpDL+SJlrnpiBfEcfmEuFitK1NSQ==}
-    engines: {node: '>=22.12'}
-
-  '@portabletext/types@4.0.2':
-    resolution: {integrity: sha512-djfIGU9n6DRrunlvj2nIDAp17URo/nA4jSXGvf+Gupx8NLLy9fmJBZ3GL8yhqn9lSVc+cKCharjOa3aOBnWbRw==}
-    engines: {node: '>=20.19 <22 || >=22.12'}
 
   '@rolldown/binding-android-arm-eabi@1.2.13':
     resolution: {integrity: sha512-Vu/NICrgdRvUOeaJZIyB2FP63s6fO/4ud5l8dXmxDx9yDyn+mN0y+gsvsVviSli+T361Aqo0h46EuMoobrwawA==}
@@ -1407,9 +1405,6 @@ packages:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
 
-  schema-dts@1.1.5:
-    resolution: {integrity: sha512-RJr9EaCmsLzBX2NDiO5Z3ux2BVosNZN5jo0gWgsyKvxKIUL5R3swNvoorulAeL9kLB0iTSX7V6aokhla2m7xbg==}
-
   semver@7.8.5:
     resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
@@ -1450,11 +1445,6 @@ packages:
     peerDependenciesMeta:
       svelte:
         optional: true
-
-  svelte-seo@2.0.0:
-    resolution: {integrity: sha512-taLhDc7tqxKLhUlVEqzK4McowtQtmCtyJFs4cuH68rBWJF9TYBpIkjWQM6mnOIu9Zxq9jqMO+EvRqiNK4TzADw==}
-    peerDependencies:
-      svelte: '5'
 
   svelte@5.57.2:
     resolution: {integrity: sha512-1YiPCAXT0Ct6g1vOMmSLa0Nsc3QRMvtDF32ihgglGVrugIuIK38RyDiFNXVDhtQ81TJjSO57NdMw6DyYLqSGDQ==}
@@ -1781,6 +1771,12 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
+  '@fontsource/ibm-plex-mono@5.3.0': {}
+
+  '@fontsource/im-fell-english@5.3.0': {}
+
+  '@fontsource/spectral@5.3.0': {}
+
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -1852,17 +1848,6 @@ snapshots:
       playwright: 1.64.0
 
   '@polka/url@1.0.0-next.29': {}
-
-  '@portabletext/svelte@4.0.0(svelte@5.57.2(@typescript-eslint/types@8.71.1))':
-    dependencies:
-      '@portabletext/toolkit': 6.0.0
-      svelte: 5.57.2(@typescript-eslint/types@8.71.1)
-
-  '@portabletext/toolkit@6.0.0':
-    dependencies:
-      '@portabletext/types': 4.0.2
-
-  '@portabletext/types@4.0.2': {}
 
   '@rolldown/binding-android-arm-eabi@1.2.13':
     optional: true
@@ -2786,8 +2771,6 @@ snapshots:
     dependencies:
       mri: 1.2.0
 
-  schema-dts@1.1.5: {}
-
   semver@7.8.5: {}
 
   shebang-command@2.0.0:
@@ -2829,11 +2812,6 @@ snapshots:
       postcss-selector-parser: 7.1.6
       semver: 7.8.5
     optionalDependencies:
-      svelte: 5.57.2(@typescript-eslint/types@8.71.1)
-
-  svelte-seo@2.0.0(svelte@5.57.2(@typescript-eslint/types@8.71.1)):
-    dependencies:
-      schema-dts: 1.1.5
       svelte: 5.57.2(@typescript-eslint/types@8.71.1)
 
   svelte@5.57.2(@typescript-eslint/types@8.71.1):
