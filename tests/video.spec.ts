@@ -19,15 +19,11 @@ async function openYearWithVideo(page: Page) {
 
 const paused = (video: Locator) => video.evaluate((v: HTMLVideoElement) => v.paused)
 
-/**
- * Bring a video on screen the way a reader gets there. A month far down the page is not drawn
- * until it is near the screen, and a jump straight to something inside it lands in the wrong
- * place, so go to the month first and then to the video.
- */
-async function reach(video: Locator) {
-	await video.evaluate((v) => v.closest('section')?.scrollIntoView())
-	await video.scrollIntoViewIfNeeded()
-}
+/** Bring a video to the middle of the screen at once, without the glide a jump has by default. */
+const reach = (video: Locator) =>
+	video.evaluate((v) => {
+		v.scrollIntoView({ block: 'center', behavior: 'instant' })
+	})
 
 test('a video plays while it is on screen and stops when it leaves', async ({ page }) => {
 	const fetched: string[] = []

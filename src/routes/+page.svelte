@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Photo from '#lib/components/Photo.svelte'
+	import { sizes } from '#lib/content/image.ts'
 	import type { PageProps } from './$types'
 
 	let { data }: PageProps = $props()
@@ -36,12 +37,7 @@
 					{/if}
 					<span class="strip">
 						{#each year.frames as frame (frame.key)}
-							<Photo
-								image={frame}
-								sizes="(min-width: 860px) 300px, 150px"
-								eager={i === 0}
-								decorative
-							/>
+							<Photo image={frame} sizes={sizes('strip', frame)} small eager={i === 0} decorative />
 						{/each}
 					</span>
 				</a>

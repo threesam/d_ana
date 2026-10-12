@@ -10,11 +10,15 @@
 		eager?: boolean | undefined
 		/** Inside a link that already has a name, the photograph says nothing more. */
 		decorative?: boolean | undefined
+		/** A thumbnail: also offer the files under 320px wide. */
+		small?: boolean | undefined
 	}
 
-	let { image, sizes, eager = false, decorative = false }: Props = $props()
+	let { image, sizes, eager = false, decorative = false, small = false }: Props = $props()
 
-	const source = $derived(sources(image))
+	const source = $derived(sources(image, small))
+	// four places is finer than a pixel at any size drawn, and a quarter of the characters in every tag
+	const ratio = $derived(Math.round((image.width / image.height) * 1e4) / 1e4)
 </script>
 
 <!-- `lone`: a photograph on its own is the box the layouts size and place (`.photo`); under a
@@ -32,7 +36,7 @@
 		fetchpriority={eager ? 'high' : 'auto'}
 		decoding="async"
 		style:background-color={image.tone}
-		style:--ratio={image.width / image.height}
+		style:--ratio={ratio}
 	/>
 {/snippet}
 
@@ -40,11 +44,7 @@
 	<!-- The still is an ordinary lazy photograph and the video lies over it, empty until it plays:
 	     a `poster` would be fetched for every video on the page at once. No sound, no controls.
 	     It plays while it is on screen; a tap or Enter stops and starts it (the script in app.html). -->
-	<div
-		class="photo plays"
-		style:background-color={image.tone}
-		style:--ratio={image.width / image.height}
-	>
+	<div class="photo plays" style:background-color={image.tone} style:--ratio={ratio}>
 		{@render still(false)}
 		<video
 			aria-label="Video. Press Enter to stop or start it"

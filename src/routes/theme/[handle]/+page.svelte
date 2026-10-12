@@ -14,19 +14,19 @@
 	/>
 </svelte:head>
 
-<section class="wrap title-page">
+<section class="wrap title-page alone">
 	<h1>{data.theme.title}</h1>
 	{#if data.theme.description}
 		<p class="lede">{data.theme.description}</p>
 	{/if}
 </section>
 
-{#each data.months as month, i (month.month)}
+{#each data.months as month (month.month)}
 	<section class="wrap month" aria-labelledby="heading-{month.month}">
 		<h2 id="heading-{month.month}">
 			<a href="/{month.month.slice(0, 4)}#{month.month}">{monthLabel(month.month, true)}</a>
 		</h2>
-		<Blocks blocks={month.blocks} eager={i === 0} />
+		<Blocks blocks={month.blocks} />
 	</section>
 {/each}
 
@@ -37,10 +37,8 @@
 	}
 
 	.month {
-		content-visibility: auto;
-		contain-intrinsic-size: auto 1600px;
-		/* skipping off-screen months also clips each month to its own box, so the box is the full
-		   width of the screen and the column is its padding: a photograph can run off the edge */
+		/* a month is the full width of the screen and the column is its padding, so a photograph
+		   can run off the edge and the row of months can fade out in the margins */
 		max-width: none;
 		padding-inline: var(--bleed);
 	}

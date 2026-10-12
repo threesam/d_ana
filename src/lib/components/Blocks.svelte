@@ -1,15 +1,14 @@
 <script lang="ts">
 	import type { Block, Figure } from '#lib/content/compose.ts'
+	import { sizes } from '#lib/content/image.ts'
 	import { dayLabel, mentions, unnamed } from '#lib/content/index.ts'
 	import Photo from './Photo.svelte'
 
 	interface Props {
 		blocks: Block[]
-		/** Load the first photograph of this run straight away. */
-		eager?: boolean | undefined
 	}
 
-	let { blocks, eager = false }: Props = $props()
+	let { blocks }: Props = $props()
 
 	// the city, not the street: a caption says roughly where, never an address
 	const where = (figure: Figure) => {
@@ -58,25 +57,17 @@
 {#each blocks as block, i (i)}
 	{#if block.layout === 'bleed'}
 		<figure class={['block', 'bleed', block.side]}>
-			<Photo
-				image={block.figure.image}
-				sizes="(min-width: 860px) 50vw, 85vw"
-				eager={eager && i === 0}
-			/>
+			<Photo image={block.figure.image} sizes={sizes('bleed', block.figure.image)} />
 			<figcaption>{@render caption(block.figure)}</figcaption>
 		</figure>
 	{:else if block.layout === 'stagger'}
 		<div class={['block', 'stagger', block.drop]}>
 			<figure class="a">
-				<Photo
-					image={block.a.image}
-					sizes="(min-width: 860px) 40vw, 70vw"
-					eager={eager && i === 0}
-				/>
+				<Photo image={block.a.image} sizes={sizes('first', block.a.image)} />
 				<figcaption>{@render caption(block.a)}</figcaption>
 			</figure>
 			<figure class="b">
-				<Photo image={block.b.image} sizes="(min-width: 860px) 32vw, 70vw" />
+				<Photo image={block.b.image} sizes={sizes('second', block.b.image)} />
 				<figcaption>{@render caption(block.b)}</figcaption>
 			</figure>
 		</div>
@@ -104,6 +95,8 @@
 		margin-block: clamp(56px, 9vw, 144px);
 	}
 
+	/* The columns and heights here are mirrored by `sizes()` in content/image.ts, which tells the
+	   browser how wide each photograph is drawn. Change one, change the other. */
 	/* A photograph's box is worked out from its shape (--ratio, set by Photo), never from the
 	   file: with `width: auto` it was 0 by 0 until it loaded, and one run off the right edge
 	   never came into view, so it never loaded at all. */

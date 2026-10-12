@@ -109,6 +109,28 @@ Design rules that are decisions, not taste to revisit: white page, black type, n
 colour except the photographs; Poiret One (titles, upright only: it has no italic), Spectral and IBM Plex Mono;
 nothing moves; no dark theme; no em dashes in copy.
 
+## Speed
+
+The site is media heavy and scores 100 on Lighthouse in all four categories, phone and
+desktop. Keep it there:
+
+- **Everything is static and on a CDN.** HTML from Vercel's edge, photographs and
+  videos from `cdn.sanity.io` (cached a year). Visitors never call the Sanity API.
+  The build does, with `useCdn: false`, which is right for a static build: it must
+  see what was just changed. Do not add a fetch that runs in the browser.
+- **CSS is inlined** (`inlineStyleThreshold` in `vite.config.ts`). `src/hooks.server.ts`
+  repairs the font addresses SvelteKit 3.0.1 leaves relative in the inlined CSS when
+  there is no client build. Delete the hook once SvelteKit does it; the smoke test
+  "the type faces load" tells you when that is safe (it fails if a face 404s).
+- **`sizes()` in `content/image.ts` mirrors the grid in `Blocks.svelte`** and the
+  thumbnail height in `routes/+page.svelte`. Change a column or a height cap in one
+  and you must change the other, or browsers fetch the wrong file.
+- **A video fetches nothing until it plays** (`preload="none"`, no `poster`: the still
+  is an ordinary lazy `<img>` under it).
+- **Measure before and after** any change to layout, images or fonts:
+  `pnpm build && pnpm preview`, then Lighthouse with `--form-factor=mobile` and with
+  `--preset=desktop` on `/`, a full year, a theme and `/places`.
+
 ## Conventions
 
 - **Pin exact versions** — no `^`/`~` anywhere in `package.json` (incl.

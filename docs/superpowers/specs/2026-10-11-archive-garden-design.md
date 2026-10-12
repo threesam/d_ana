@@ -139,10 +139,16 @@ a place. Never a street.
 
 ### Images
 
-- URLs come from the Sanity image builder: `auto=format`, a width from a fixed
-  ladder (320 to 1920, never wider than the photograph), `fit=max`, quality 75.
+- URLs come from the Sanity image builder: `auto=format` (AVIF or WebP per browser), a
+  width from a fixed ladder (320 to 1920, never wider than the photograph), `fit=max`.
+  Quality is 75, and 60 for the files 960 wide and up, which only dense screens use.
+  Thumbnails on the home page also get 160 and 240.
 - Every `<img>` has `srcset`, `sizes`, `width`, `height`, `loading="lazy"` and
   `decoding="async"`. The first image on a page loads eagerly with high priority.
+- `sizes` says how wide the photograph is really drawn: its columns, or less when its
+  height is capped (`sizes()` in `content/image.ts`, which mirrors the grid in
+  `Blocks.svelte`). A tall story is far narrower than its columns, and a plain "40vw"
+  had browsers fetch about twice the pixels.
 - Pages ship no framework JavaScript (`csr = false`). The one thing that moves is a video:
   it plays, without sound or controls, while it is on screen and stops when it leaves
   (Sam, 2026-10-11). A tap, Enter or Space stops one and it stays stopped. Someone who
@@ -153,8 +159,27 @@ a place. Never a street.
   until it arrives, and `width` and `height` hold its place, so nothing jumps. The
   blurred preview (LQIP) was left out: at about 1 KB each it would add 400 KB of
   markup to a full year.
-- Day sections use `content-visibility: auto` so a year of four hundred images
-  costs what is on screen.
+- Months are drawn in full. They used to be skipped while off screen
+  (`content-visibility: auto`), which saved about a third of a second of layout on a
+  slow phone for the biggest year. It also made every month a guess at its own height
+  until it was drawn, so a jump to a month landed in the wrong place. The page scores
+  100 without it, and the row of months needs the true heights.
+
+### Speed
+
+Everything a visitor gets is static and comes from a CDN. Pages are HTML written at
+build time and served from Vercel's edge. Photographs and videos come from Sanity's
+CDN and are cached for a year. No visitor ever calls the Sanity API: the build does,
+once, with `useCdn: false` so a rebuild always sees what was just changed.
+
+- All CSS (about 20 KB) is written into each page, so nothing blocks the first paint.
+  `src/hooks.server.ts` corrects the font addresses SvelteKit 3.0.1 leaves wrong in it.
+- The page connects to the image CDN before the first photograph is asked for, and
+  fetches the title face with the page.
+- A video downloads nothing until it plays, and waits a quarter second on screen first.
+- In Chrome, hovering or pressing a link gets the next page ready (speculation rules).
+- Lighthouse, phone and desktop, on home, two years, a theme and places: 100 in all
+  four categories is the bar. AGENTS.md says how to measure.
 
 ### Map
 

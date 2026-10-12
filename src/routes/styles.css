@@ -37,6 +37,13 @@
 		color: var(--color-ink);
 	}
 
+	/* a jump to a month glides there */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
 	body {
 		font: 300 18px/1.62 var(--font-read);
 		/* a bled photograph may reach under a classic scrollbar; never let that scroll the page */
@@ -104,5 +111,17 @@
 		margin-top: 20px;
 		max-width: 44ch;
 		font-size: 20px;
+	}
+
+	/* On a phone a year or a theme opens on its title alone, filling the first screen under
+	   the masthead (74px), and the first photograph starts on the next. The first screen is
+	   then complete the moment the page arrives, with nothing in it still to be fetched. */
+	@media (max-width: 859px) {
+		.title-page.alone {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			min-height: calc(100svh - 74px);
+		}
 	}
 }

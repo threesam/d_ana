@@ -1,9 +1,15 @@
 <script lang="ts">
+	import titleFace from '@fontsource/poiret-one/files/poiret-one-latin-400-normal.woff2?url'
 	import type { LayoutProps } from './$types'
 	import './styles.css'
 
 	let { children }: LayoutProps = $props()
 </script>
+
+<svelte:head>
+	<!-- the title face is the first thing drawn on every page: fetch it with the page -->
+	<link rel="preload" href={titleFace} as="font" type="font/woff2" crossorigin="anonymous" />
+</svelte:head>
 
 <a class="skip mono" href="#main">Skip to content</a>
 

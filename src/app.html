@@ -4,13 +4,26 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
+		<!-- every photograph and video comes from here: open the connection before the first is asked for -->
+		<link rel="preconnect" href="https://cdn.sanity.io" />
+		<!-- not a script: tells Chrome to get a page ready when a link to it is hovered or pressed,
+		     so moving between years is instant. Other browsers ignore it. -->
+		<script type="speculationrules">
+			{ "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }] }
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
-		<!-- The only script on the site. A video plays while it is on screen and stops when it
-		     leaves. A tap, Enter or Space stops one, and it then stays stopped until she starts it
-		     again. Someone who asked for less motion, or to save data, starts each one themselves. -->
+		<!-- The only script on the site, in two parts.
+
+		     Videos: one plays while it is on screen and stops when it leaves. A tap, Enter or Space
+		     stops one, and it then stays stopped until she starts it again. Someone who asked for
+		     less motion, or to save data, starts each one themselves.
+
+		     Months (a year page): the row of month names sticks to the top of the screen and
+		     follows the page. The month being read stands where its heading would. The next one
+		     draws nearer as the page is read down, and arrives as its own section does. -->
 		<script>
 			{
 				const calm =
@@ -51,6 +64,64 @@
 					e.preventDefault()
 					toggle(e.target)
 				})
+
+				const run = document.querySelector('.run')
+				if (run) {
+					const track = run.querySelector('.ribbon ol')
+					const pane = track.parentElement
+					const names = [...track.children]
+					const months = [...run.querySelectorAll('section')]
+					// where each name starts along the row, how wide it is, and how wide the column is
+					let starts, widths, column
+					const measure = () => {
+						starts = names.map((name) => name.offsetLeft - names[0].offsetLeft)
+						widths = names.map((name) => name.offsetWidth)
+						column = pane.clientWidth - 2 * parseFloat(getComputedStyle(pane).paddingLeft)
+						place()
+					}
+					let queued = 0
+					const place = () => {
+						queued = 0
+						const tops = months.map((month) => month.getBoundingClientRect().top)
+						// the month whose top has reached the top of the screen; none yet means the row is at rest
+						const reached = tops.findLastIndex((top) => top <= 0.5)
+						const now = Math.max(reached, 0)
+						const next = Math.min(now + 1, names.length - 1)
+						// how far through this month the page is: 0 at its top, 1 where the next begins
+						const through =
+							reached < 0 || next === now ? 0 : Math.min(-tops[now] / (tops[next] - tops[now]), 1)
+						// The row moves all the way down the month, slowly at first and quickest at the end,
+						// so the name of the month being read stays readable for most of it.
+						const x = starts[now] + through ** 3 * (starts[next] - starts[now])
+						track.style.transform = `translateX(${-x}px)`
+						run.classList.toggle('stuck', reached >= 0)
+						names.forEach((name, n) => {
+							name.classList.toggle('now', n === now)
+							// a name is as solid as the share of it that is inside the column
+							const from = starts[n] - x
+							const inside = Math.min(from + widths[n], column) - Math.max(from, 0)
+							name.firstElementChild.style.opacity = Math.max(0, Math.min(inside / widths[n], 1))
+						})
+					}
+					// A jump to a month glides there (CSS). From far off the glide would run through every
+					// month on the way, fetching photographs nobody stops at, so then it goes straight there.
+					addEventListener('click', (e) => {
+						const link = e.target.closest('a[href^="#"]')
+						const month = link && document.getElementById(link.hash.slice(1))
+						if (!month || Math.abs(month.getBoundingClientRect().top) < innerHeight * 2) return
+						const root = document.documentElement
+						root.style.scrollBehavior = 'auto'
+						setTimeout(() => (root.style.scrollBehavior = ''))
+					})
+					run.classList.add('live')
+					addEventListener('scroll', () => (queued ||= requestAnimationFrame(place)), {
+						passive: true
+					})
+					addEventListener('resize', measure)
+					// the names change width when the title face arrives
+					document.fonts.ready.then(measure)
+					measure()
+				}
 			}
 		</script>
 	</body>

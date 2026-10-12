@@ -1,20 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { ladder, sources } from './image.ts'
+import { ladder, sizes, sources } from './image.ts'
 
 const base = `https://cdn.sanity.io/images/${import.meta.env.VITE_SANITY_PROJECT_ID}/${import.meta.env.VITE_SANITY_DATASET}`
 
 describe('ladder', () => {
 	it('stops at the width of the photograph and includes it', () => {
-		expect(ladder(1080)).toEqual([320, 480, 640, 800, 1080])
-		expect(ladder(900)).toEqual([320, 480, 640, 800, 900])
+		expect(ladder(1080)).toEqual([320, 480, 560, 640, 800, 960, 1080])
+		expect(ladder(900)).toEqual([320, 480, 560, 640, 800, 900])
 	})
 
 	it('never asks for more than the top of the ladder', () => {
-		expect(ladder(4000)).toEqual([320, 480, 640, 800, 1080, 1440, 1920])
+		expect(ladder(4000)).toEqual([320, 480, 560, 640, 800, 960, 1080, 1440, 1920])
 	})
 
 	it('gives a tiny photograph its own width only', () => {
 		expect(ladder(200)).toEqual([200])
+	})
+
+	it('starts lower for a thumbnail, which is drawn far smaller than 320', () => {
+		expect(ladder(1080, true).slice(0, 4)).toEqual([160, 240, 320, 480])
+		expect(ladder(200, true)).toEqual([160, 200])
 	})
 })
 
@@ -27,8 +32,46 @@ describe('sources', () => {
 
 	it('lists every step of the ladder with its width', () => {
 		const { srcset } = sources(image)
-		expect(srcset.split(', ')).toHaveLength(5)
+		expect(srcset.split(', ')).toHaveLength(7)
 		expect(srcset).toContain(`${base}/abc123-1080x1920.jpg?w=320&q=75&fit=max&auto=format 320w`)
 		expect(srcset.endsWith(' 1080w')).toBe(true)
+	})
+
+	it('asks for less quality in the files only a dense screen uses', () => {
+		const { srcset } = sources(image)
+		expect(srcset).toContain('w=800&q=75&')
+		expect(srcset).toContain('w=960&q=60&')
+		expect(srcset).toContain('w=1080&q=60&')
+	})
+
+	it('offers a thumbnail the small files', () => {
+		expect(sources(image, true).srcset).toContain('w=160&q=75&fit=max&auto=format 160w')
+	})
+})
+
+describe('sizes', () => {
+	// a story: 9 wide, 16 tall
+	const story = { width: 1080, height: 1920 }
+
+	it('says how wide a photograph is drawn: its columns, or less when its height is capped', () => {
+		expect(sizes('bleed', story)).toBe(
+			'(min-width: 860px) min(46vw, 600px, 51.8vh), min(77vw, 51.8vh)'
+		)
+		expect(sizes('first', story)).toBe(
+			'(min-width: 860px) min(38vw, 496px, 46.1vh), min(69vw, 46.1vh)'
+		)
+		expect(sizes('second', story)).toBe(
+			'(min-width: 860px) min(30vw, 392px, 46.1vh), min(69vw, 46.1vh)'
+		)
+	})
+
+	it('lets a wide photograph fill its columns', () => {
+		expect(sizes('bleed', { width: 1600, height: 900 })).toBe(
+			'(min-width: 860px) min(46vw, 600px, 163.6vh), min(77vw, 163.6vh)'
+		)
+	})
+
+	it('sizes a thumbnail in the row of four by its fixed height', () => {
+		expect(sizes('strip', story)).toBe('(min-width: 1416px) 104px, (min-width: 739px) 7.3vw, 54px')
 	})
 })

@@ -36,7 +36,7 @@ test('every photograph holds its place before it loads, and none is cut', async 
 	const cut = await page.locator('main .bleed .photo').evaluateAll(
 		(photos) =>
 			photos.slice(0, 6).filter((photo) => {
-				photo.scrollIntoView({ block: 'center' })
+				photo.scrollIntoView({ block: 'center', behavior: 'instant' })
 				const box = photo.getBoundingClientRect()
 				const outer = box.left < innerWidth - box.right ? box.left + 3 : box.right - 3
 				return !photo.contains(document.elementFromPoint(outer, innerHeight / 2))
@@ -45,10 +45,69 @@ test('every photograph holds its place before it loads, and none is cut', async 
 	expect(cut).toBe(0)
 })
 
-test('pages are static: the only script is the few lines that play a video', async ({ page }) => {
+test('pages are static: the only script is a few lines of its own', async ({ page }) => {
 	await page.goto('/')
 	await expect(page.locator('script[src], link[rel="modulepreload"]')).toHaveCount(0)
-	await expect(page.locator('script')).toHaveCount(1)
+	// the speculation rules are a hint to the browser in a script tag, not a script
+	await expect(page.locator('script:not([type="speculationrules"])')).toHaveCount(1)
+})
+
+test('the row of months sticks, follows the page, and a click goes to that month', async ({
+	page
+}) => {
+	await page.setViewportSize({ width: 1280, height: 800 })
+	await page.goto('/')
+	await page.locator('a.year').first().click()
+	const names = page.locator('.ribbon li')
+	const months = page.locator('.run section')
+	expect(await names.count()).toBeGreaterThan(2)
+
+	const left = (n: number) => names.nth(n).evaluate((name) => name.getBoundingClientRect().left)
+	const top = (n: number) => months.nth(n).evaluate((month) => month.getBoundingClientRect().top)
+	// at rest the first name stands exactly over the first month's heading
+	const column = await months
+		.first()
+		.locator('h2')
+		.evaluate((heading) => heading.getBoundingClientRect().left)
+	expect(Math.abs((await left(0)) - column)).toBeLessThan(1)
+	await expect(page.locator('.run')).not.toHaveClass(/stuck/)
+
+	// at the second month, its name stands where the first one stood
+	await months.nth(1).evaluate((month) => {
+		month.scrollIntoView({ behavior: 'instant' })
+	})
+	await expect.poll(async () => Math.abs((await left(1)) - column)).toBeLessThan(1)
+	await expect(page.locator('.run')).toHaveClass(/stuck/)
+
+	// a click on the next name brings that month to the top, and its name into place
+	await names.nth(2).locator('a').click()
+	await expect.poll(async () => Math.abs(await top(2))).toBeLessThan(1)
+	await expect.poll(async () => Math.abs((await left(2)) - column)).toBeLessThan(1)
+
+	// from the list at the top of the page, the last month is far: it still lands exactly
+	await page.evaluate(() => {
+		scrollTo({ top: 0, behavior: 'instant' })
+	})
+	await page.locator('nav.months a').last().click()
+	const last = (await months.count()) - 1
+	await expect.poll(async () => Math.abs(await top(last))).toBeLessThan(1)
+	await expect.poll(async () => Math.abs((await left(last)) - column)).toBeLessThan(1)
+})
+
+test('the type faces load and nothing the page asks for is missing', async ({ page }) => {
+	const missing: string[] = []
+	page.on('response', (response) => {
+		if (response.status() >= 400) missing.push(response.url())
+	})
+	await page.goto('/')
+	await page.evaluate(() => document.fonts.ready)
+
+	expect(missing).toEqual([])
+	const loaded = await page.evaluate(() =>
+		[...document.fonts].filter((face) => face.status === 'loaded').map((face) => face.family)
+	)
+	expect(loaded.some((family) => family.includes('Poiret One'))).toBe(true)
+	expect(loaded.some((family) => family.includes('Spectral'))).toBe(true)
 })
 
 test('the skip link moves focus into the page', async ({ page }) => {
