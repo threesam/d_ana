@@ -91,10 +91,13 @@
 		margin-block: clamp(56px, 9vw, 144px);
 	}
 
+	/* A photograph's box is worked out from its shape (--ratio, set by Photo), never from the
+	   file: with `width: auto` it was 0 by 0 until it loaded, and one run off the right edge
+	   never came into view, so it never loaded at all. */
 	.block :global(img) {
 		display: block;
-		width: auto;
-		max-width: 100%;
+		width: min(100%, calc(var(--tall) * var(--ratio)));
+		height: auto;
 	}
 
 	figcaption {
@@ -112,9 +115,11 @@
 	}
 
 	/* Bleed: one photograph runs off an edge, her words stay small at the other side. */
+	.bleed {
+		--tall: 92svh;
+	}
 	.bleed :global(img) {
 		grid-row: 1;
-		max-height: 92svh;
 	}
 	.bleed figcaption {
 		grid-row: 1;
@@ -141,8 +146,8 @@
 	.stagger figure {
 		grid-row: 1;
 	}
-	.stagger :global(img) {
-		max-height: 82svh;
+	.stagger {
+		--tall: 82svh;
 	}
 	.stagger .b {
 		margin-top: clamp(48px, 14vw, 220px);

@@ -28,4 +28,5 @@
 	fetchpriority={eager ? 'high' : 'auto'}
 	decoding="async"
 	style:background-color={image.tone}
+	style:--ratio={image.width / image.height}
 />

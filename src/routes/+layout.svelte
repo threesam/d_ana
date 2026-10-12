@@ -44,7 +44,7 @@
 		padding-block: 20px;
 	}
 	.mark {
-		font: 400 24px/1 var(--font-title);
+		font: 400 34px/1 var(--font-title);
 		text-decoration-line: none;
 	}
 	.mark:hover {

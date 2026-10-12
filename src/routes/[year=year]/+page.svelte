@@ -58,7 +58,7 @@
 	.month h2 {
 		padding-top: 20px;
 		border-top: 1px solid var(--color-rule);
-		font-size: 28px;
+		font-size: clamp(32px, 4vw, 44px);
 		line-height: 1.1;
 	}
 
