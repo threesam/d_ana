@@ -48,8 +48,31 @@ describe('plot', () => {
 		expect(dots.map((d) => d.count).sort()).toEqual([1, 2])
 	})
 
+	it('does not label two places whose names would print over each other', () => {
+		const dots = plot(
+			[
+				spot('Philadelphia', 39.95, -75.16),
+				spot('Philadelphia', 39.95, -75.16),
+				spot('Camden', 39.94, -75.12),
+				spot('Portland', 45.52, -122.68)
+			],
+			frame
+		)
+		expect(dots.find((d) => d.city === 'Philadelphia')?.label).toBe(true)
+		expect(dots.find((d) => d.city === 'Camden')?.label).toBe(false)
+		expect(dots.find((d) => d.city === 'Portland')?.label).toBe(true)
+	})
+
+	it('prints a name to the left of a dot that sits at the right edge', () => {
+		const dots = plot([spot('Portland', 45.52, -122.68), spot('Budapest', 47.5, 19.04)], frame)
+		expect(dots.find((d) => d.city === 'Budapest')?.anchor).toBe('end')
+		expect(dots.find((d) => d.city === 'Portland')?.anchor).toBe('start')
+	})
+
 	it('labels only the places with a name, most pieces first, eight at most', () => {
-		const spots = Array.from({ length: 12 }, (_, i) => spot(`City ${String(i)}`, 30 + i, -100 + i))
+		const spots = Array.from({ length: 12 }, (_, i) =>
+			spot(`City ${String(i)}`, 20 + i * 4, -120 + i * 12)
+		)
 		const dots = plot([...spots, spot('', 10, 10)], frame)
 		expect(dots.filter((d) => d.label)).toHaveLength(8)
 		expect(dots.find((d) => d.city === '')?.label).toBe(false)

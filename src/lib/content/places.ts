@@ -12,6 +12,8 @@ export interface Dot {
 	count: number
 	city: string
 	label: boolean
+	/** Which side of the dot its name is printed on. */
+	anchor: 'start' | 'end'
 }
 
 export interface Frame {
@@ -21,6 +23,9 @@ export interface Frame {
 }
 
 const LABELS = 8
+// room one printed name needs, in frame units: names closer than this would overprint
+const LABEL_W = 150
+const LABEL_H = 18
 
 /**
  * A map with no map: one dot per place, bigger where more was made, laid out by longitude and
@@ -61,23 +66,34 @@ export function plot(spots: Spot[], frame: Frame): Dot[] {
 	const offsetX = (frame.width - spanX * fit) / 2
 	const offsetY = (frame.height - spanY * fit) / 2
 
-	const labelled = new Set(
-		flat
-			.filter((p) => p.city !== '')
-			.sort((a, b) => b.count - a.count)
-			.slice(0, LABELS)
-			.map((p) => p.city)
-	)
-
 	// one decimal is finer than a pixel and keeps the markup short
 	const round = (n: number) => Math.round(n * 10) / 10
+	const dots = flat.map((p) => {
+		const x = round(offsetX + (p.px - Math.min(...xs)) * fit)
+		return {
+			x,
+			y: round(offsetY + (p.py - Math.min(...ys)) * fit),
+			r: round(2 + 1.6 * Math.sqrt(p.count)),
+			count: p.count,
+			city: p.city,
+			label: false,
+			anchor: x > frame.width - frame.pad - LABEL_W ? ('end' as const) : ('start' as const)
+		}
+	})
 
-	return flat.map((p) => ({
-		x: round(offsetX + (p.px - Math.min(...xs)) * fit),
-		y: round(offsetY + (p.py - Math.min(...ys)) * fit),
-		r: round(2 + 1.6 * Math.sqrt(p.count)),
-		count: p.count,
-		city: p.city,
-		label: labelled.has(p.city)
-	}))
+	// name the fullest places first, and skip any whose name would print over one already there
+	const named: Dot[] = []
+	for (const dot of [...dots].sort((a, b) => b.count - a.count)) {
+		if (named.length === LABELS) break
+		if (dot.city === '') continue
+		const clear = named.every(
+			(n) => Math.abs(n.x - dot.x) > LABEL_W || Math.abs(n.y - dot.y) > LABEL_H
+		)
+		if (clear) {
+			dot.label = true
+			named.push(dot)
+		}
+	}
+
+	return dots
 }

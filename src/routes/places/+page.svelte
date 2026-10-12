@@ -28,7 +28,12 @@
 			{#each data.dots as dot (`${String(dot.x)},${String(dot.y)}`)}
 				<circle cx={dot.x} cy={dot.y} r={dot.r} />
 				{#if dot.label}
-					<text x={dot.x + dot.r + 6} y={dot.y + 4} aria-hidden="true">{dot.city}</text>
+					<text
+						x={dot.anchor === 'end' ? dot.x - dot.r - 6 : dot.x + dot.r + 6}
+						y={dot.y + 4}
+						text-anchor={dot.anchor}
+						aria-hidden="true">{dot.city}</text
+					>
 				{/if}
 			{/each}
 		</svg>
