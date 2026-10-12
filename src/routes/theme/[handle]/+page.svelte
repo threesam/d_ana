@@ -39,6 +39,10 @@
 	.month {
 		content-visibility: auto;
 		contain-intrinsic-size: auto 1600px;
+		/* skipping off-screen months also clips each month to its own box, so the box is the full
+		   width of the screen and the column is its padding: a photograph can run off the edge */
+		max-width: none;
+		padding-inline: var(--bleed);
 	}
 	.month h2 {
 		padding-top: 20px;

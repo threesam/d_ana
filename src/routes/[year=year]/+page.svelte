@@ -53,6 +53,10 @@
 		/* a year can hold hundreds of photographs: only lay out the months near the screen */
 		content-visibility: auto;
 		contain-intrinsic-size: auto 2400px;
+		/* skipping off-screen months also clips each month to its own box, so the box is the full
+		   width of the screen and the column is its padding: a photograph can run off the edge */
+		max-width: none;
+		padding-inline: var(--bleed);
 		scroll-margin-top: 24px;
 	}
 	.month h2 {

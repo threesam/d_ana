@@ -13,9 +13,11 @@ test('home lists the years and a year shows described photographs', async ({ pag
 	await expect(page.locator('main img:not([alt]), main img[alt=""]')).toHaveCount(0)
 })
 
-test('every photograph holds its place before it loads', async ({ page }) => {
+test('every photograph holds its place before it loads, and none is cut', async ({ page }) => {
 	// no image file ever arrives, so a box can only come from the page itself. A box of nothing
 	// at the right edge is never "in view", so the browser never fetches that photograph.
+	// wider than the column, so there is a margin for a photograph to run into
+	await page.setViewportSize({ width: 1600, height: 900 })
 	await page.route('**/cdn.sanity.io/**', (route) => route.abort())
 	await page.goto('/')
 	await page.locator('a.year').first().click()
@@ -29,6 +31,18 @@ test('every photograph holds its place before it loads', async ({ page }) => {
 			}).length
 	)
 	expect(empty).toBe(0)
+
+	// a photograph set to run off the edge must not be cut at the column: its outer edge is still it
+	const cut = await page.locator('main .bleed img').evaluateAll(
+		(images) =>
+			images.slice(0, 6).filter((image) => {
+				image.scrollIntoView({ block: 'center' })
+				const box = image.getBoundingClientRect()
+				const outer = box.left < innerWidth - box.right ? box.left + 3 : box.right - 3
+				return document.elementFromPoint(outer, innerHeight / 2) !== image
+			}).length
+	)
+	expect(cut).toBe(0)
 })
 
 test('pages are static: no script is shipped', async ({ page }) => {

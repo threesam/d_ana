@@ -116,7 +116,7 @@
 		margin-top: clamp(72px, 10vw, 144px);
 	}
 	.themes h2 {
-		font-size: 28px;
+		font-size: clamp(32px, 4vw, 44px);
 		line-height: 1.1;
 	}
 	.themes ul {

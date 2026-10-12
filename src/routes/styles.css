@@ -28,7 +28,7 @@
 		--gutter: clamp(16px, 4vw, 48px);
 		--wrap: 1320px;
 		/* how far a photograph travels to run off the edge of the screen */
-		--bleed: max(var(--gutter), calc((100vw - var(--wrap)) / 2));
+		--bleed: calc(var(--gutter) + max(0px, (100vw - var(--wrap)) / 2));
 		color-scheme: light;
 	}
 
