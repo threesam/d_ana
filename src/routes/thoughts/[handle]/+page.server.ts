@@ -3,9 +3,10 @@ import type { Post } from '#lib/types.ts'
 import { client } from '#lib/utils/sanity.ts'
 import type { PageServerLoad } from './$types'
 
-// since there's no dynamic data here, we can prerender
-// it so that it gets served as a static asset in production
-export const prerender = true
+// Prerender every thought the home page links to. 'auto' rather than true so the build
+// still passes when the dataset holds no thoughts: the route is then rendered on demand
+// (and 404s) instead of failing the build as "marked prerenderable but never reached".
+export const prerender = 'auto'
 
 export const load: PageServerLoad = async ({ params }) => {
 	const post = await client.fetch<Post | null>(
