@@ -165,6 +165,23 @@ a place. Never a street.
   until it was drawn, so a jump to a month landed in the wrong place. The page scores
   100 without it, and the row of months needs the true heights.
 
+### The months of a year
+
+On a year page the month names are one row (Sam, 2026-10-11). Until the first month
+reaches the top of the screen only its name shows, as that month's heading. Then the row
+sticks and the other names arrive one after another. Reading down, the row slides so the
+next month draws nearer, slowly at first and quickest at the end, and that name arrives
+in the heading's place exactly as its own section does. A name fades as it leaves the
+column on either side. A click on a name goes to that month: a glide when it is near,
+straight there when it is far.
+
+- The row is a picture of the headings, for the eye and the pointer. It is hidden from
+  screen readers and the keyboard, which have the headings themselves (kept in place,
+  not drawn) and the list of months on the title page.
+- Without the script the row is not there and the headings are drawn as usual.
+- The travel is eased (the cube of how far through the month the page is). Linear is
+  one character away in `app.html` if the name should leave sooner.
+
 ### Speed
 
 Everything a visitor gets is static and comes from a CDN. Pages are HTML written at
