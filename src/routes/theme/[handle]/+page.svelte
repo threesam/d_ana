@@ -22,8 +22,13 @@
 </section>
 
 {#each data.months as month (month.month)}
-	<section class="wrap month" aria-labelledby="heading-{month.month}">
-		<h2 id="heading-{month.month}">
+	<section
+		class="wrap month"
+		id={month.month}
+		aria-labelledby="heading-{month.month}"
+		data-seen="read"
+	>
+		<h2 id="heading-{month.month}" data-via="heading">
 			<a href="/{month.month.slice(0, 4)}#{month.month}">{monthLabel(month.month, true)}</a>
 		</h2>
 		<Blocks blocks={month.blocks} />

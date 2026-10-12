@@ -16,7 +16,7 @@
 	{#if data.intro}
 		<p class="lede">{data.intro}</p>
 	{/if}
-	<nav class="mono months" aria-label="Months of {data.year}">
+	<nav class="mono months" aria-label="Months of {data.year}" data-via="list">
 		{#each data.months as month (month.month)}
 			<a href="#{month.month}">{monthLabel(month.month)}</a>
 		{/each}
@@ -29,7 +29,7 @@
 	     where its heading would, and the next draws nearer as you read down (the script in
 	     app.html moves it). It is there for the eye and the pointer only. Screen readers and the
 	     keyboard have the headings themselves and the list of months at the top of the page. -->
-	<div class="ribbon" aria-hidden="true">
+	<div class="ribbon" aria-hidden="true" data-via="row">
 		<!-- the names are one strip that scrolls sideways (`tabindex` keeps it out of the tab order) -->
 		<div class="window" tabindex="-1">
 			<ol>
@@ -43,14 +43,19 @@
 	</div>
 
 	{#each data.months as month (month.month)}
-		<section class="wrap month" id={month.month} aria-labelledby="heading-{month.month}">
+		<section
+			class="wrap month"
+			id={month.month}
+			aria-labelledby="heading-{month.month}"
+			data-seen="read"
+		>
 			<h2 id="heading-{month.month}">{monthLabel(month.month)}</h2>
 			<Blocks blocks={month.blocks} />
 		</section>
 	{/each}
 </div>
 
-<nav class="wrap mono pager" aria-label="Other years">
+<nav class="wrap mono pager" aria-label="Other years" data-via="pager">
 	{#if data.earlier !== null}
 		<a href="/{data.earlier}">Earlier, {data.earlier}</a>
 	{:else}

@@ -26,7 +26,7 @@
 	{#if data.years.length === 0}
 		<p>Nothing is here yet.</p>
 	{/if}
-	<ol class="years">
+	<ol class="years" data-via="years">
 		{#each data.years as year, i (year.year)}
 			<li>
 				<a class="year" href="/{year.year}">
@@ -47,7 +47,12 @@
 </section>
 
 {#if data.themes.length > 0}
-	<section class="wrap themes" aria-labelledby="themes-heading">
+	<section
+		class="wrap themes"
+		aria-labelledby="themes-heading"
+		data-via="themes"
+		data-seen="themes"
+	>
 		<h2 id="themes-heading">Themes</h2>
 		<ul>
 			{#each data.themes as theme (theme.handle)}

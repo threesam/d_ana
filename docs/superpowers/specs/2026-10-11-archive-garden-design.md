@@ -158,8 +158,8 @@ a place. Never a street.
 - Pages ship no framework JavaScript (`csr = false`). The one thing that moves is a video:
   it plays, without sound or controls, while it is on screen and stops when it leaves
   (Sam, 2026-10-11). A tap, Enter or Space stops one and it stays stopped. Someone who
-  asked for less motion or to save data starts each one themselves. That is the one
-  inline script.
+  asked for less motion or to save data starts each one themselves. That is one part of
+  the site's one inline script (the months row and the visitor count are the others).
 - A video is a photograph with a `video` file attached. The photograph is the still.
 - Each photograph's own dominant colour (from Sanity's metadata) is the background
   until it arrives, and `width` and `height` hold its place, so nothing jumps. The
@@ -229,6 +229,48 @@ once, with `useCdn: false` so a rebuild always sees what was just changed.
 - Lighthouse, phone and desktop, on home, two years, a theme and places: 100 in all
   four categories is the bar. AGENTS.md says how to measure.
 
+### Counting
+
+Visits are counted with umami on Sam's own server (`analytics.sixtom.com`), the same one
+his other sites use (Sam, 2026-10-12: "umami analytics to the gills"). No cookie, nothing
+kept in the browser, no third party.
+
+- **The tracker is the one script file on the site, and the page never waits for it.**
+  The inline script adds it after the page has loaded. If the server is slow or down,
+  nothing on the site changes.
+- **A page Chrome got ready behind a hovered link is not a visit.** The tracker is added
+  only once the page is really shown (`document.prerendering`), or every hover would count.
+- **Only d-ana.com counts.** On a preview or a laptop the tracker loads and says nothing.
+- **`?test` takes a browser out of the count for good, `?test=0` puts it back.** Sam's
+  rule for every site of his, so his own visits never count.
+- **Clicks are not counted with umami's `data-umami-event`.** That holds a click until the
+  tracker's request has come back, so a slow server would hold every link. The inline
+  script says each click to the tracker itself and the link goes on at once.
+- **Speed is measured on real visits too**: the tracker reports how fast each page drew
+  (LCP, CLS, INP, first byte), which is the field check on the Lighthouse scores.
+
+What is counted, by name:
+
+| Name                              | When                                                                  | Carries                                                |
+| --------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------ |
+| page view                         | every page opened                                                     | address, where the visitor came from                   |
+| `follow`                          | a click on her Instagram or TikTok at the foot                        | `to`                                                   |
+| `out`                             | a click on any other link that leaves the site (an account she names) | `to`, `via`                                            |
+| `year`, `theme`, `places`, `home` | a click on a link to that page                                        | `to`, `via`                                            |
+| `month`                           | a click on a month's name                                             | `to`, `via` (`list` at the top, `row` when it follows) |
+| `jump`                            | any other link within the page (the skip link)                        | `to`                                                   |
+| `read`                            | a month has stayed on screen for two seconds                          | `id` (the month)                                       |
+| `end`                             | the foot of a page has stayed on screen for two seconds               |                                                        |
+| `themes`                          | the list of themes on the home page was reached                       |                                                        |
+| `swipe`                           | the row of months was swiped by hand (once a page)                    |                                                        |
+| `video`                           | a video was stopped or started by hand                                | `do`, `in` (the month)                                 |
+| `404`                             | a page that is not there was opened                                   |                                                        |
+
+`via` is the part of the page a link is in, from `data-via` on whatever holds it: `top`,
+`foot`, `years`, `themes`, `list`, `row`, `pager`, `heading`, `words`, `with`, `missing`,
+or `page` when nothing says. A new link needs no markup to be counted. Something new to be
+counted when it is read needs only `data-seen="name"`.
+
 ### Map
 
 A pin board, drawn as one SVG at build time. The whole world is always in view
@@ -251,6 +293,10 @@ The write happens on the server with a token. Until then she can flip
   URL ladder, the catalog's visibility rule.
 - End to end: the home page lists years, a year page renders and has no image
   without alt text, a hidden piece does not appear.
+- Counting (`tests/analytics.spec.ts`): the tracker is added after the page and only
+  speaks on d-ana.com, a visit's clicks and months read are said by name, a missing
+  page is counted, and `?test` takes a browser out. The tests stand in for the tracker
+  and never reach the server.
 - Gates stay as they are: check, lint, test, build, and accessibility at 100.
 
 ## Not in this change

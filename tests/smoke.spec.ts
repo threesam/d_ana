@@ -81,11 +81,21 @@ test('every photograph holds its place before it loads, and none is cut', async 
 	expect(cut).toBe(0)
 })
 
-test('pages are static: the only script is a few lines of its own', async ({ page }) => {
+test('pages are static: as served, the only script is a few lines of its own', async ({
+	page,
+	request
+}) => {
+	// what the server sends asks for no script file and no framework code
+	const served = await (await request.get('/')).text()
+	expect(served).not.toMatch(/<script[^>]*\ssrc=|rel="modulepreload"/)
+
 	await page.goto('/')
-	await expect(page.locator('script[src], link[rel="modulepreload"]')).toHaveCount(0)
+	await expect(page.locator('link[rel="modulepreload"]')).toHaveCount(0)
 	// the speculation rules are a hint to the browser in a script tag, not a script
-	await expect(page.locator('script:not([type="speculationrules"])')).toHaveCount(1)
+	await expect(page.locator('script:not([type="speculationrules"]):not([src])')).toHaveCount(1)
+	// the one script file is the visitor count, which that script adds once the page has loaded
+	// (tests/analytics.spec.ts holds it to its terms)
+	await expect(page.locator('script[src]')).toHaveCount(1)
 })
 
 test('the row of months sticks, follows the page, and a click glides to that month', async ({

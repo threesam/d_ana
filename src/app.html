@@ -15,7 +15,12 @@
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
-		<!-- The only script on the site, in two parts.
+		<!-- The site's own script, in three parts. The only other script is the visitor count
+		     (umami, from Sam's server), which this one fetches once the page is up.
+
+		     Counting: what a reader does is told to umami by name. A click on a link is named for
+		     where the link goes. What asks to be counted when it is read (`data-seen`) is counted
+		     once it has stayed on screen. Nothing here waits for the tracker or the server.
 
 		     Videos: one plays while it is on screen and stops when it leaves. A tap, Enter or Space
 		     stops one, and it then stays stopped until she starts it again. Someone who asked for
@@ -28,6 +33,45 @@
 		     gone by, and a click on a name goes there. -->
 		<script>
 			{
+				// `?test` takes this browser out of the count for good and `?test=0` puts it back:
+				// Sam's rule for every site of his, so that his own visits are never visits. It is
+				// umami's own switch, which the tracker reads before everything it sends.
+				try {
+					const test = new URLSearchParams(location.search).get('test')
+					if (test === '0') localStorage.removeItem('umami.disabled')
+					else if (test !== null) localStorage.setItem('umami.disabled', '1')
+				} catch {
+					// (a browser that keeps nothing has nothing to remember)
+				}
+				// Anything said before the tracker is here waits for it.
+				const early = []
+				const say = (name, data) =>
+					window.umami ? umami.track(name, data) : early.push([name, data])
+
+				// A click on any link is counted, named for where the link goes: out of the site
+				// (`follow` from the foot of the page, where her own accounts are, otherwise `out`),
+				// to a month on this page, to a year, or to the page it names. `via` is the part of
+				// the page the link is in (`data-via` on whatever holds it).
+				// It is counted from here, not by the tracker's own `data-umami-event`: that holds a
+				// click until the tracker's request has come back, so a slow server would hold the site.
+				const named = (link, via) => {
+					if (link.host !== location.host) return via === 'foot' ? 'follow' : 'out'
+					if (link.pathname === location.pathname && link.hash)
+						return /^#\d{4}-\d\d$/.test(link.hash) ? 'month' : 'jump'
+					if (/^\/\d{4}$/.test(link.pathname)) return 'year'
+					return link.pathname.split('/')[1] || 'home'
+				}
+				addEventListener('click', (e) => {
+					const link = e.target.closest('a[href]')
+					if (!link) return
+					const via = link.closest('[data-via]')?.dataset.via ?? 'page'
+					const to =
+						link.host === location.host
+							? link.pathname + link.hash
+							: link.hostname.replace(/^www\./, '') + link.pathname.replace(/\/$/, '')
+					say(named(link, via), { to, via })
+				})
+
 				const calm =
 					matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData
 				const play = (video) => {
@@ -36,6 +80,10 @@
 				}
 				// `held`: stopped by hand, so coming back on screen does not start it again
 				const toggle = (video) => {
+					say('video', {
+						do: video.paused ? 'start' : 'stop',
+						in: video.closest('section[id]')?.id
+					})
 					if (video.paused) {
 						delete video.dataset.held
 						play(video)
@@ -168,7 +216,11 @@
 						'scroll',
 						() => {
 							if (hop >= 0) arrived()
-							else if (Math.abs(pane.scrollLeft - put) > 2) swiped = performance.now()
+							else if (Math.abs(pane.scrollLeft - put) > 2) {
+								// (the first swipe on a page is the one counted)
+								if (swiped === -Infinity) say('swipe')
+								swiped = performance.now()
+							}
 							fade(pane.scrollLeft)
 						},
 						{ passive: true }
@@ -178,6 +230,48 @@
 					document.fonts.ready.then(measure)
 					measure()
 				}
+
+				// The count starts once the page is up and, in Chrome, really being looked at: a page
+				// made ready behind a hovered link (the speculation rules in the head) is not a visit
+				// until it is opened. The tracker is umami from Sam's own server: no cookie, nothing
+				// kept in the browser. It counts the page and how fast it drew; the rest is said above.
+				const count = () => {
+					const tracker = document.createElement('script')
+					tracker.src = 'https://analytics.sixtom.com/script.js'
+					tracker.dataset.websiteId = 'cdd11c24-c689-4580-90a8-17bd8f1a374f'
+					// (only on the real site: a preview or a laptop fetches it and it stays silent)
+					tracker.dataset.domains = 'd-ana.com'
+					tracker.dataset.performance = 'true'
+					tracker.onload = () => {
+						for (const [name, data] of early.splice(0)) umami.track(name, data)
+					}
+					document.head.append(tracker)
+
+					// What asks to be counted when it is read (`data-seen`: a month, the foot of a page,
+					// a page that is not there) is counted once it has stayed on screen for two seconds,
+					// so a month the page only glides past is not one that was read.
+					// ponytail: one wait for everything; give months their own if two seconds proves wrong
+					const lingering = new WeakMap()
+					const noticed = new IntersectionObserver((entries) => {
+						for (const { target, isIntersecting } of entries) {
+							clearTimeout(lingering.get(target))
+							if (isIntersecting)
+								lingering.set(
+									target,
+									setTimeout(() => {
+										noticed.unobserve(target)
+										say(target.dataset.seen, target.id ? { id: target.id } : undefined)
+									}, 2000)
+								)
+						}
+					})
+					for (const part of document.querySelectorAll('[data-seen]')) noticed.observe(part)
+				}
+				addEventListener('load', () => {
+					if (document.prerendering)
+						document.addEventListener('prerenderingchange', count, { once: true })
+					else count()
+				})
 			}
 		</script>
 	</body>

@@ -12,6 +12,7 @@ Tailwind v4, content from Sanity, deployed on Vercel.
 | Sanity project / dataset | `elspywtm` / `production` (public, read via `useCdn: false`)           |
 | Hosting                  | Vercel project `d-ana` (scope `threesam`), Node 22.x                   |
 | Deploys                  | Vercel Git integration: merge to `main` ships prod; PRs get previews   |
+| Analytics                | umami at `analytics.sixtom.com`, site `d-ana.com` (see Counting)       |
 
 Content env vars (names only — values live in `.env` locally and in Vercel):
 `VITE_SANITY_PROJECT_ID`, `VITE_SANITY_DATASET`. CI sets them inline since
@@ -23,12 +24,13 @@ The site is her archive: every post and story she made, a page per year.
 Design and content model: `docs/superpowers/specs/2026-10-11-archive-garden-design.md`.
 
 - `src/routes/+layout.server.ts` — `prerender = true` and `csr = false` for the
-  whole site: static HTML, no framework JavaScript shipped. The one script is a few
-  inline lines in `src/app.html` with two jobs: it plays a video while it is on
-  screen, and on a year page it moves the sticky row of months with the page (the row
-  is a strip that scrolls sideways, so a swipe moves it too). Keep it
-  that way; anything that needs more script or a server (the future edit mode)
-  opts out per route.
+  whole site: static HTML, no framework JavaScript shipped. The site's own script is a
+  few inline lines in `src/app.html` with three jobs: it plays a video while it is on
+  screen, on a year page it moves the sticky row of months with the page (the row
+  is a strip that scrolls sideways, so a swipe moves it too), and it counts what a
+  visitor does (see Counting). The only script file is the umami tracker, which that
+  script adds after the page has loaded. Keep it that way; anything that needs more
+  script or a server (the future edit mode) opts out per route.
 - `src/routes/+page.*` — home: the title page and the index of years and themes.
 - `src/routes/[year=year]/` — a year, month by month. `src/params.ts` holds the
   `year` matcher, so `/2019` is a year and anything else 404s.
@@ -132,6 +134,38 @@ desktop. Keep it there:
 - **Measure before and after** any change to layout, images or fonts:
   `pnpm build && pnpm preview`, then Lighthouse with `--form-factor=mobile` and with
   `--preset=desktop` on `/`, a full year, a theme and `/places`.
+
+## Counting
+
+umami on Sam's server, website id in `src/app.html`. The spec has the full list of what
+is counted and why it is built this way. The rules that bite:
+
+- **Never put `data-umami-event` on a link.** The tracker then holds the click until its
+  request has come back, and a slow analytics server would hold the site's links. Clicks
+  are said from the inline script instead (`say()`), and every link is counted without
+  markup: the name comes from where the link goes.
+- **`data-via="name"`** on a container says where its links are (`top`, `foot`, `list`,
+  `row`, …). **`data-seen="name"`** on an element counts it once it has stayed on screen
+  for two seconds (an `id`, if it has one, goes along).
+- **The tracker is added after `load`, and not while Chrome is prerendering.** Do not
+  move it into the head: the page would wait on Sam's server, and a hovered link would
+  count as a visit.
+- **Only `d-ana.com` counts** (`data-domains`). To see events while working, run
+  `tests/analytics.spec.ts`, which stands in for the tracker.
+- **`?test` on any address takes your browser out of the count; `?test=0` puts it back.**
+  Use it before clicking around the live site.
+- umami drops visits from headless browsers (it answers 200 and stores nothing), so an
+  automated check against the real server needs an ordinary browser name.
+
+## Content changes and deploys
+
+The Sanity project has a webhook named `Vercel` that calls a Vercel deploy hook to
+rebuild `main`. It is **switched off** (2026-10-12): it fired once for every document in
+every dataset, so the archive import asked for a production build per document, every
+one failed against the old `main`, and the account's daily allowance of 100 deployments
+went with them: Vercel refused every preview here and on the Studio until the webhook
+was switched off twelve hours later. Before a bulk write to Sanity, check it is still
+off. When it goes back on it should watch the `production` dataset only.
 
 ## Conventions
 

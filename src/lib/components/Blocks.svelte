@@ -24,7 +24,7 @@
 
 <!-- her words, with every account she named as the link to it -->
 {#snippet words(text: string)}
-	<p class="text">
+	<p class="text" data-via="words">
 		{#each mentions(text) as part, i (i)}{#if part.handle === null}{part.text}{:else}{@render account(
 					part.handle,
 					part.text
@@ -44,7 +44,7 @@
 			{@render words(figure.piece.text)}
 		{/if}
 		{#if others.length > 0}
-			<p class="mono muted">
+			<p class="mono muted" data-via="with">
 				With
 				{#each others as person, i (person)}
 					{i > 0 ? ', ' : ''}{@render account(person.slice(1), person)}
