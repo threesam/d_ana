@@ -44,7 +44,6 @@
 		padding-top: 20px;
 		border-top: 1px solid var(--color-rule);
 		font-size: 28px;
-		font-style: italic;
 		line-height: 1.1;
 	}
 </style>

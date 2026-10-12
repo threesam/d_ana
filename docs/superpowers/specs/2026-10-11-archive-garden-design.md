@@ -20,17 +20,17 @@ Success looks like this:
 
 ## Decisions already made
 
-| Decision                                                                                       | Source          |
-| ---------------------------------------------------------------------------------------------- | --------------- |
-| White page, black type, no color except the photographs                                        | Sam             |
-| Type: IM Fell English (titles), Spectral Light (reading), IBM Plex Mono (dates, captions)      | Board round one |
-| Layouts kept: Bleed, Stagger pair, Title page. Passed: One frame, Indented column, Pulled line | Board round two |
-| Nothing moves                                                                                  | Board round one |
-| One page per year                                                                              | Sam             |
-| Pieces showing children are tagged and hidden by default                                       | Sam             |
-| Sanity holds the content; images are served from its CDN, sized per screen, lazy loaded        | Sam             |
-| The route parameter and the Sanity field are named `handle`, never `slug`                      | Sam             |
-| No email capture, no contact form, no About page                                               | Sam             |
+| Decision                                                                                                               | Source          |
+| ---------------------------------------------------------------------------------------------------------------------- | --------------- |
+| White page, black type, no color except the photographs                                                                | Sam             |
+| Type: Poiret One (titles, her pick from the heading picker), Spectral Light (reading), IBM Plex Mono (dates, captions) | Deana           |
+| Layouts kept: Bleed, Stagger pair, Title page. Passed: One frame, Indented column, Pulled line                         | Board round two |
+| Nothing moves                                                                                                          | Board round one |
+| One page per year                                                                                                      | Sam             |
+| Pieces showing children are tagged and hidden by default                                                               | Sam             |
+| Sanity holds the content; images are served from its CDN, sized per screen, lazy loaded                                | Sam             |
+| The route parameter and the Sanity field are named `handle`, never `slug`                                              | Sam             |
+| No email capture, no contact form, no About page                                                                       | Sam             |
 
 Design read: a personal archive set like a book and paged by year. White page, black
 type, color only from her work.

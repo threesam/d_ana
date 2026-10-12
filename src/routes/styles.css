@@ -1,6 +1,5 @@
 @import 'tailwindcss';
-@import '@fontsource/im-fell-english/400.css';
-@import '@fontsource/im-fell-english/400-italic.css';
+@import '@fontsource/poiret-one/400.css';
 @import '@fontsource/spectral/300.css';
 @import '@fontsource/spectral/300-italic.css';
 @import '@fontsource/spectral/400.css';
@@ -12,8 +11,8 @@
 */
 @theme {
 	--font-*: initial;
-	/* IM Fell English has no Cyrillic, so Spectral sits second and sets her Russian. */
-	--font-title: 'IM Fell English', Spectral, 'Iowan Old Style', Georgia, serif;
+	/* Poiret One: one weight, no italic, and it carries Cyrillic, so it sets her Russian too. */
+	--font-title: 'Poiret One', 'Century Gothic', 'Avenir Next', system-ui, sans-serif;
 	--font-read: Spectral, Georgia, 'Times New Roman', serif;
 	--font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 

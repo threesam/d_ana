@@ -104,7 +104,7 @@ that nothing scrolls sideways, every photograph has its place held before it
 loads, and Lighthouse accessibility is 100.
 
 Design rules that are decisions, not taste to revisit: white page, black type, no
-colour except the photographs; IM Fell English, Spectral and IBM Plex Mono;
+colour except the photographs; Poiret One (titles, upright only: it has no italic), Spectral and IBM Plex Mono;
 nothing moves; no dark theme; no em dashes in copy.
 
 ## Conventions

@@ -127,7 +127,7 @@
 		max-width: 1000px;
 	}
 	.themes a {
-		font: italic 400 clamp(24px, 3vw, 36px) / 1.2 var(--font-title);
+		font: 400 clamp(24px, 3vw, 36px) / 1.2 var(--font-title);
 	}
 
 	@media (max-width: 859px) {
