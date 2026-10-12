@@ -31,7 +31,7 @@ Design and content model: `docs/superpowers/specs/2026-10-11-archive-garden-desi
 - `src/routes/theme/[handle]/` — one theme across years. `src/routes/places/` — the map.
 - `src/lib/content/` — pure logic, unit tested: `compose.ts` (which layout each
   photograph gets), `image.ts` (the Sanity CDN `srcset` ladder), `places.ts` (the
-  dot map), `index.ts` (year summaries, date labels), `types.ts`.
+  pin board: whole world, never zoomed), `index.ts` (year summaries, date labels), `types.ts`.
 - `src/lib/server/content.ts` — the Sanity client and every GROQ query. Server
   only. Every query filters on `visibility == "shown"`; never add one that doesn't.
 - `src/lib/components/` — `Photo.svelte` (the only `<img>`: `srcset`, `sizes`,

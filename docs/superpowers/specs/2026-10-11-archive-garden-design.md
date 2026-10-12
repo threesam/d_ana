@@ -115,7 +115,7 @@ month the photographs run in order with a date under each.
 | `/`               | The years, newest first. Each year is one photograph, the year, and its opening line. |
 | `/[year]`         | The year, in order. Days are the unit: a mono date, then that day's pieces.           |
 | `/theme/[handle]` | The same pieces, across years, for one theme.                                         |
-| `/places`         | A map of dots and nothing else, with the list of places under it.                     |
+| `/places`         | The world on a cork board with a pin per place, and the list of places under it.      |
 
 The footer is a colophon: her name, the two social links, the year. No navigation
 bar beyond the wordmark and the list of years.
@@ -153,8 +153,11 @@ a place. Never a street.
 
 ### Map
 
-A plain SVG. One dot per place, sized by how many pieces were made there. No
-basemap, no tiles, no library. City names in mono beside the larger clusters.
+A pin board, drawn as one SVG at build time. The whole world is always in view
+(Natural Earth projection fitted to the sphere, never to the pins). The continents
+are a paper cut-out on cork, with one black pin per place, sized by how many pieces
+were made there. City names in mono beside the larger clusters. No tiles and no
+script in the browser. Cork is the one colour on the site that is not a photograph.
 
 ## Hiding and showing (edit mode)
 

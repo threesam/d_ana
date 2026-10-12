@@ -1,4 +1,4 @@
-import { geoMercator, geoPath, type GeoPermissibleObjects } from 'd3-geo'
+import { geoNaturalEarth1, geoPath, type GeoPermissibleObjects } from 'd3-geo'
 
 /** Where one piece was made. `city` may be empty. */
 export interface Spot {
@@ -24,30 +24,36 @@ export interface Frame {
 	pad: number
 }
 
+/** What to draw under the pins: the continents, and optionally the borders between countries. */
+export interface World {
+	land: GeoPermissibleObjects
+	borders?: GeoPermissibleObjects | undefined
+}
+
 export interface Chart {
 	dots: Dot[]
-	/** SVG path data for the coastlines and borders inside the frame. Empty when no world was given. */
+	/** SVG path data for the continents. Empty when no world was given. */
 	land: string
+	/** SVG path data for the borders between countries. Empty when none were given. */
+	borders: string
 }
 
 const LABELS = 8
 // room one printed name needs, in frame units: names closer than this would overprint
-const LABEL_W = 150
-const LABEL_H = 18
-/** Mercator scale for a map with a single place on it: roughly a country wide. */
-const ALONE = 900
+const LABEL_W = 120
+const LABEL_H = 16
 
 /**
- * An ink map: the world's outline drawn under one dot per place, bigger where more was made.
- * The view is fitted to the places, so it shows only the part of the world she has been in.
+ * A pin board: the whole world in view, with one pin per place, bigger where more was made.
+ * The view never zooms to the pins, so a place sits where it does on any world map.
  */
-export function plot(spots: Spot[], frame: Frame, world?: GeoPermissibleObjects): Chart {
+export function plot(spots: Spot[], frame: Frame, world?: World): Chart {
 	const groups = new Map<string, Spot[]>()
 	for (const spot of spots) {
 		const key = spot.city === '' ? `${spot.lat.toFixed(1)},${spot.lng.toFixed(1)}` : spot.city
 		groups.set(key, [...(groups.get(key) ?? []), spot])
 	}
-	if (groups.size === 0) return { dots: [], land: '' }
+	if (groups.size === 0) return { dots: [], land: '', borders: '' }
 
 	const mean = (values: number[]) => values.reduce((a, b) => a + b, 0) / values.length
 	const places = [...groups.values()].map((members) => ({
@@ -56,25 +62,18 @@ export function plot(spots: Spot[], frame: Frame, world?: GeoPermissibleObjects)
 		point: [mean(members.map((m) => m.lng)), mean(members.map((m) => m.lat))] as [number, number]
 	}))
 
-	const projection = geoMercator().clipExtent([
-		[0, 0],
-		[frame.width, frame.height]
-	])
-	projection.fitExtent(
-		[
-			[frame.pad, frame.pad],
-			[frame.width - frame.pad, frame.height - frame.pad]
-		],
-		{ type: 'MultiPoint', coordinates: places.map((p) => p.point) }
-	)
-	// one place (or several on one spot) has no extent to fit: centre it at a fixed scale
-	const first = places[0]
-	if (first !== undefined && (places.length === 1 || !Number.isFinite(projection.scale()))) {
-		projection
-			.scale(ALONE)
-			.center(first.point)
-			.translate([frame.width / 2, frame.height / 2])
-	}
+	const projection = geoNaturalEarth1()
+		.clipExtent([
+			[0, 0],
+			[frame.width, frame.height]
+		])
+		.fitExtent(
+			[
+				[frame.pad, frame.pad],
+				[frame.width - frame.pad, frame.height - frame.pad]
+			],
+			{ type: 'Sphere' }
+		)
 
 	// one decimal is finer than a pixel and keeps the markup short
 	const round = (n: number) => Math.round(n * 10) / 10
@@ -106,6 +105,10 @@ export function plot(spots: Spot[], frame: Frame, world?: GeoPermissibleObjects)
 		}
 	}
 
-	const land = world === undefined ? '' : (geoPath(projection).digits(1)(world) ?? '')
-	return { dots, land }
+	const path = geoPath(projection).digits(1)
+	return {
+		dots,
+		land: world === undefined ? '' : (path(world.land) ?? ''),
+		borders: world?.borders === undefined ? '' : (path(world.borders) ?? '')
+	}
 }
