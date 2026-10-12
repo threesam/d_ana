@@ -86,7 +86,7 @@ test('a visit is counted: where the reader goes, what they read, and a follow', 
 			{ capture: true, once: true }
 		)
 	})
-	await page.locator('footer nav a').first().click()
+	await page.locator('footer nav[aria-label="Elsewhere"] a').first().click()
 	expect(said).toContainEqual(['follow', { to: 'instagram.com/__d_ana___', via: 'foot' }])
 	// and having stayed at the foot, the reader has reached the end of the page
 	await expect.poll(() => said, { timeout: 8000 }).toContainEqual(['end', undefined])

@@ -1,15 +1,17 @@
 <script lang="ts">
 	import Blocks from '#lib/components/Blocks.svelte'
+	import Head from '#lib/components/Head.svelte'
 	import { monthLabel } from '#lib/content/index.ts'
 	import type { PageProps } from './$types'
 
 	let { data }: PageProps = $props()
 </script>
 
-<svelte:head>
-	<title>{data.year} | d-ana</title>
-	<meta name="description" content="Photographs and notes by d-ana from {data.year}." />
-</svelte:head>
+<Head
+	title="{data.year} | d-ana"
+	description="Photographs and notes by d-ana from {data.year}."
+	cover={data.cover}
+/>
 
 <section class="wrap title-page alone">
 	<h1>{data.year}</h1>
@@ -20,6 +22,15 @@
 		{#each data.months as month (month.month)}
 			<a href="#{month.month}">{monthLabel(month.month)}</a>
 		{/each}
+	</nav>
+	<!-- the way to the year before and the year after, without reading this one to its foot -->
+	<nav class="mono beside" aria-label="The years beside this one" data-via="beside">
+		{#if data.earlier !== null}
+			<a href="/{data.earlier}">Earlier, {data.earlier}</a>
+		{/if}
+		{#if data.later !== null}
+			<a href="/{data.later}">Later, {data.later}</a>
+		{/if}
 	</nav>
 </section>
 
@@ -70,8 +81,20 @@
 	.months {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 6px 20px;
+		gap: 12px 20px;
 		margin-top: 28px;
+	}
+	/* tall and wide enough for a thumb ("May" alone is not): the rows stand one on the other */
+	.months a,
+	.beside a,
+	.pager a {
+		padding: 6px 2px;
+		margin: -6px -2px;
+	}
+	.beside {
+		display: flex;
+		gap: 24px;
+		margin-top: 20px;
 	}
 
 	.month {

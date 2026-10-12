@@ -41,12 +41,19 @@ Design and content model: `docs/superpowers/specs/2026-10-11-archive-garden-desi
 - `src/lib/server/content.ts` — the Sanity client and every GROQ query. Server
   only. Every query filters on `visibility == "shown"`; never add one that doesn't.
 - `src/lib/components/` — `Photo.svelte` (the only `<img>`: `srcset`, `sizes`,
-  lazy loading, intrinsic size) and `Blocks.svelte` (Bleed, Stagger pair, Title page).
+  lazy loading, intrinsic size), `Blocks.svelte` (Bleed, Stagger pair, Title page) and
+  `Head.svelte` (a page's title, description, one address and the card a shared link
+  shows: every page uses it instead of its own `<svelte:head>`).
+- `src/routes/+layout.server.ts` also loads every year and theme for the lists at the
+  foot of each page. `src/routes/sitemap.xml/` is the sitemap.
 - `src/routes/styles.css` — tokens (four colours, three typefaces) and the few
   shared classes. Layout CSS lives with its component.
 
 Every route is prerendered at build time, so `pnpm build` fetches live content
-from the public dataset. The public dataset holds only pieces cleared to be seen;
+from the public dataset. A question every page asks (the years, the themes) is put to
+Sanity once a build (`once()` in `server/content.ts`). The one page drawn at request
+time is the 404, and it must never query Sanity: guard any new layout data the way
+`+layout.server.ts` does. The public dataset holds only pieces cleared to be seen;
 new work lands in a private dataset first and is copied over once tagged. The site
 never needs a token.
 
@@ -145,7 +152,7 @@ is counted and why it is built this way. The rules that bite:
   are said from the inline script instead (`say()`), and every link is counted without
   markup: the name comes from where the link goes.
 - **`data-via="name"`** on a container says where its links are (`top`, `foot`, `list`,
-  `row`, …). **`data-seen="name"`** on an element counts it once it has stayed on screen
+  `row`, `beside`, …). **`data-seen="name"`** on an element counts it once it has stayed on screen
   for two seconds (an `id`, if it has one, goes along).
 - **The tracker is added after `load`, and not while Chrome is prerendering.** Do not
   move it into the head: the page would wait on Sam's server, and a hovered link would

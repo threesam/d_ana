@@ -23,7 +23,7 @@ test('home lists the years and a year shows described photographs', async ({ pag
 test('the foot of every page says where else she is', async ({ page }) => {
 	for (const path of ['/', '/places']) {
 		await page.goto(path)
-		const elsewhere = page.locator('footer nav a')
+		const elsewhere = page.locator('footer nav[aria-label="Elsewhere"] a')
 		await expect(elsewhere).toHaveCount(2)
 		await expect(elsewhere.nth(0)).toHaveAttribute('href', 'https://www.instagram.com/__d_ana___')
 		await expect(elsewhere.nth(1)).toHaveAttribute('href', 'https://tiktok.com/@d_ana___')

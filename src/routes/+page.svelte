@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Head from '#lib/components/Head.svelte'
 	import Photo from '#lib/components/Photo.svelte'
 	import { sizes } from '#lib/content/image.ts'
 	import type { PageProps } from './$types'
@@ -9,10 +10,11 @@
 	const to = $derived(data.years[0]?.year)
 </script>
 
-<svelte:head>
-	<title>d-ana</title>
-	<meta name="description" content="Photographs and notes by d-ana, kept year by year." />
-</svelte:head>
+<Head
+	title="d-ana"
+	description="Photographs and notes by d-ana, kept year by year."
+	cover={data.years[0]?.frames[0]}
+/>
 
 <section class="wrap title-page">
 	<h1>d-ana</h1>
@@ -27,7 +29,7 @@
 		<p>Nothing is here yet.</p>
 	{/if}
 	<ol class="years" data-via="years">
-		{#each data.years as year, i (year.year)}
+		{#each data.years as year (year.year)}
 			<li>
 				<a class="year" href="/{year.year}">
 					<span class="numeral">{year.year}</span>
@@ -37,7 +39,7 @@
 					{/if}
 					<span class="strip">
 						{#each year.frames as frame (frame.key)}
-							<Photo image={frame} sizes={sizes('strip', frame)} small eager={i === 0} decorative />
+							<Photo image={frame} sizes={sizes('strip', frame)} small decorative />
 						{/each}
 					</span>
 				</a>
@@ -49,6 +51,7 @@
 {#if data.themes.length > 0}
 	<section
 		class="wrap themes"
+		id="themes"
 		aria-labelledby="themes-heading"
 		data-via="themes"
 		data-seen="themes"

@@ -150,7 +150,11 @@ a place. Never a street.
   Quality is 75, and 60 for the files 960 wide and up, which only dense screens use.
   Thumbnails on the home page also get 160 and 240.
 - Every `<img>` has `srcset`, `sizes`, `width`, `height`, `loading="lazy"` and
-  `decoding="async"`. The first image on a page loads eagerly with high priority.
+  `decoding="async"`. None is fetched ahead of the page: the largest thing on every first
+  screen is type, so the type faces go first. (The newest year's four frames on the home
+  page used to load eagerly at high priority. On a slow line they raced the faces, and
+  whether they landed before the first paint decided if Lighthouse gave the home page
+  99 or 100.)
 - `sizes` says how wide the photograph is really drawn: its columns, or less when its
   height is capped (`sizes()` in `content/image.ts`, which mirrors the grid in
   `Blocks.svelte`). A tall story is far narrower than its columns, and a plain "40vw"
@@ -229,6 +233,34 @@ once, with `useCdn: false` so a rebuild always sees what was just changed.
 - Lighthouse, phone and desktop, on home, two years, a theme and places: 100 in all
   four categories is the bar. AGENTS.md says how to measure.
 
+### Getting around
+
+From the usability audit of 2026-10-12: inside a year the row of months is enough, but
+between things the site had dead ends. What was added:
+
+- **The masthead has Themes and Places.** Themes goes to the list on the home page
+  (`/#themes`), which was only reachable by scrolling to its foot.
+- **Every year and every theme is listed at the foot of every page**, so a theme page,
+  the map and a page that is not there all lead on. The page a reader is on is marked
+  (`aria-current`) and drawn in ink.
+- **A year opens with the years beside it** ("Earlier, 2023", "Later, 2025") under its
+  list of months. Before, the only way to the next year was the foot of the page, and
+  a full year is over a hundred screens on a phone.
+- **Every link in a menu is at least 24 by 24 pixels** (WCAG 2.2, 2.5.8), by padding
+  that takes no room: the masthead and the title page are the size they were.
+- **A shared link is a card with a photograph.** Every page says its title, its
+  description, its one address (`rel="canonical"`, always on d-ana.com) and a picture:
+  the first photograph of the year or theme, the newest year's first frame for the home
+  page, her latest photograph for the map. The picture is cut from the middle to 1200
+  by 630 as a JPEG and is never larger than the photograph (`card()` in
+  `content/image.ts`). One component writes all of it: `Head.svelte`.
+- **`/sitemap.xml`** lists home, each year, each theme and the map, and `robots.txt`
+  points at it.
+
+The page drawn for an address that is not there is the one page made when it is asked
+for. It does not ask Sanity for the lists at its foot (no visitor ever calls Sanity),
+so it has the masthead and "Back to the years" only.
+
 ### Counting
 
 Visits are counted with umami on Sam's own server (`analytics.sixtom.com`), the same one
@@ -267,8 +299,8 @@ What is counted, by name:
 | `404`                             | a page that is not there was opened                                   |                                                        |
 
 `via` is the part of the page a link is in, from `data-via` on whatever holds it: `top`,
-`foot`, `years`, `themes`, `list`, `row`, `pager`, `heading`, `words`, `with`, `missing`,
-or `page` when nothing says. A new link needs no markup to be counted. Something new to be
+`foot`, `years`, `themes`, `list`, `row`, `beside`, `pager`, `heading`, `words`, `with`,
+`missing`, or `page` when nothing says. A new link needs no markup to be counted. Something new to be
 counted when it is read needs only `data-seen="name"`.
 
 ### Map
@@ -293,6 +325,10 @@ The write happens on the server with a token. Until then she can flip
   URL ladder, the catalog's visibility rule.
 - End to end: the home page lists years, a year page renders and has no image
   without alt text, a hidden piece does not appear.
+- Getting around (`tests/nav.spec.ts`): the lists at the foot match the home page on
+  every kind of page, the masthead reaches the themes, a year opens with its
+  neighbours, no link in a menu is under 24 pixels on a phone, every page carries its
+  card and its address, and the sitemap lists every page.
 - Counting (`tests/analytics.spec.ts`): the tracker is added after the page and only
   speaks on d-ana.com, a visit's clicks and months read are said by name, a missing
   page is counted, and `?test` takes a browser out. The tests stand in for the tracker

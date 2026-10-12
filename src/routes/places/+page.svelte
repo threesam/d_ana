@@ -1,13 +1,15 @@
 <script lang="ts">
+	import Head from '#lib/components/Head.svelte'
 	import type { PageProps } from './$types'
 
 	let { data }: PageProps = $props()
 </script>
 
-<svelte:head>
-	<title>Places | d-ana</title>
-	<meta name="description" content="Where the photographs on d-ana were made." />
-</svelte:head>
+<Head
+	title="Places | d-ana"
+	description="Where the photographs on d-ana were made."
+	cover={data.cover}
+/>
 
 <section class="wrap heading">
 	<h1>Places</h1>

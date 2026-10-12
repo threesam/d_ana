@@ -1,5 +1,8 @@
 import type { Image } from './types.ts'
 
+/** Where the site lives: what a shared link and the sitemap call a page. */
+export const SITE = 'https://d-ana.com'
+
 export interface YearSummary {
 	year: number
 	count: number

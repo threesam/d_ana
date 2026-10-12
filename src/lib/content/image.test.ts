@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ladder, sizes, sources } from './image.ts'
+import { card, ladder, sizes, sources } from './image.ts'
 
 const base = `https://cdn.sanity.io/images/${import.meta.env.VITE_SANITY_PROJECT_ID}/${import.meta.env.VITE_SANITY_DATASET}`
 
@@ -73,5 +73,30 @@ describe('sizes', () => {
 
 	it('sizes a thumbnail in the row of four by its fixed height', () => {
 		expect(sizes('strip', story)).toBe('(min-width: 1416px) 104px, (min-width: 739px) 7.3vw, 54px')
+	})
+})
+
+describe('card', () => {
+	it('is a JPEG cut from the middle of the photograph to the shape a shared link is drawn in', () => {
+		expect(card({ ref: 'image-abc123-2000x1500-jpg', width: 2000, height: 1500 })).toEqual({
+			// (`rect` is the cut: the full width, 1050 of the 1500 rows, starting 225 down)
+			url: `${base}/abc123-2000x1500.jpg?rect=0,225,2000,1050&w=1200&h=630&fm=jpg&q=80&fit=crop`,
+			width: 1200,
+			height: 630
+		})
+	})
+
+	it('never asks for more than the photograph has: a story is 1080 wide', () => {
+		expect(card({ ref: 'image-abc123-1080x1920-jpg', width: 1080, height: 1920 })).toMatchObject({
+			width: 1080,
+			height: 567
+		})
+	})
+
+	it('keeps the shape when the photograph is too low for its width', () => {
+		expect(card({ ref: 'image-abc123-1200x420-jpg', width: 1200, height: 420 })).toMatchObject({
+			width: 800,
+			height: 420
+		})
 	})
 })

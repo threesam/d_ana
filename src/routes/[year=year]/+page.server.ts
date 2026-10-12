@@ -17,6 +17,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		year,
 		count: pieces.length,
 		intro: written.find((w) => w.year === year)?.intro ?? null,
+		// the year's first photograph is what a shared link to it shows
+		cover: pieces.find((piece) => piece.images.length > 0)?.images[0] ?? null,
 		months: compose(pieces),
 		earlier: years[at - 1] ?? null,
 		later: years[at + 1] ?? null

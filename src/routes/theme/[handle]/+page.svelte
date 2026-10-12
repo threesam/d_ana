@@ -1,18 +1,17 @@
 <script lang="ts">
 	import Blocks from '#lib/components/Blocks.svelte'
+	import Head from '#lib/components/Head.svelte'
 	import { monthLabel } from '#lib/content/index.ts'
 	import type { PageProps } from './$types'
 
 	let { data }: PageProps = $props()
 </script>
 
-<svelte:head>
-	<title>{data.theme.title} | d-ana</title>
-	<meta
-		name="description"
-		content={data.theme.description ?? `Photographs and notes by d-ana: ${data.theme.title}.`}
-	/>
-</svelte:head>
+<Head
+	title="{data.theme.title} | d-ana"
+	description={data.theme.description ?? `Photographs and notes by d-ana: ${data.theme.title}.`}
+	cover={data.cover}
+/>
 
 <section class="wrap title-page alone">
 	<h1>{data.theme.title}</h1>

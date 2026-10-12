@@ -43,6 +43,35 @@ export function sources(
 	}
 }
 
+/** The shape the picture of a shared link is drawn in (Open Graph's 1200 by 630). */
+const CARD = { width: 1200, height: 630 }
+
+/**
+ * The picture a shared link shows: the middle of the photograph cut to a card's shape, as a JPEG
+ * (the one format every app that draws a card reads). Never larger than the photograph itself.
+ */
+export function card(image: { ref: string; width: number; height: number }): {
+	url: string
+	width: number
+	height: number
+} {
+	let width = Math.min(CARD.width, image.width)
+	let height = Math.round((width * CARD.height) / CARD.width)
+	if (height > image.height) {
+		height = image.height
+		width = Math.round((height * CARD.width) / CARD.height)
+	}
+	const url = builder
+		.image(image.ref)
+		.width(width)
+		.height(height)
+		.fit('crop')
+		.format('jpg')
+		.quality(80)
+		.url()
+	return { url, width, height }
+}
+
 export type Slot = 'bleed' | 'first' | 'second' | 'strip'
 
 /**

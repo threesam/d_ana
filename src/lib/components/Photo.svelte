@@ -6,15 +6,13 @@
 		image: Image
 		/** How wide the photograph is drawn, as a `sizes` value, so the browser asks for the right file. */
 		sizes: string
-		/** The first photograph on a page: load it now, ahead of everything else. */
-		eager?: boolean | undefined
 		/** Inside a link that already has a name, the photograph says nothing more. */
 		decorative?: boolean | undefined
 		/** A thumbnail: also offer the files under 320px wide. */
 		small?: boolean | undefined
 	}
 
-	let { image, sizes, eager = false, decorative = false, small = false }: Props = $props()
+	let { image, sizes, decorative = false, small = false }: Props = $props()
 
 	const source = $derived(sources(image, small))
 	// four places is finer than a pixel at any size drawn, and a quarter of the characters in every tag
@@ -32,8 +30,7 @@
 		width={image.width}
 		height={image.height}
 		alt={decorative ? '' : image.alt}
-		loading={eager ? 'eager' : 'lazy'}
-		fetchpriority={eager ? 'high' : 'auto'}
+		loading="lazy"
 		decoding="async"
 		style:background-color={image.tone}
 		style:--ratio={ratio}

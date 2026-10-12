@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client'
+import { building } from '$app/env'
 import type { Spot } from '#lib/content/places.ts'
 import type { Image, Piece, Theme } from '#lib/content/types.ts'
 
@@ -41,17 +42,28 @@ const PIECE = `{
 	"themes": coalesce(themes[]->{ "handle": handle.current, title }, [])
 }`
 
+/**
+ * While the site is being built, a question every page asks (the years, the themes) is put to
+ * Sanity once and the answer shared. Anywhere else it is asked afresh, so a change shows.
+ */
+const once = <T>(ask: () => Promise<T>) => {
+	let answer: Promise<T> | undefined
+	return () => (building ? (answer ??= ask()) : ask())
+}
+
 /** The first photograph of every shown piece, oldest first: what the home page index is built from. */
-export const frames = () =>
+export const frames = once(() =>
 	client.fetch<{ day: string; image: Image }[]>(
 		`*[${SHOWN} && defined(images[0].asset)] | order(publishedAt asc) { day, "image": images[0]${IMAGE} }`
 	)
+)
 
 /** The sentences she wrote to open each year. A year with none is simply absent. */
-export const intros = () =>
+export const intros = once(() =>
 	client.fetch<{ year: number; intro: string }[]>(
 		`*[_type == "year" && defined(intro)] { year, intro }`
 	)
+)
 
 export const piecesOfYear = (year: number) =>
 	client.fetch<Piece[]>(
@@ -72,8 +84,9 @@ const THEME = `{
 }`
 
 /** Themes that have at least one shown piece, fullest first. */
-export const themes = () =>
+export const themes = once(() =>
 	client.fetch<ThemeSummary[]>(`*[_type == "theme"] ${THEME} [count > 0] | order(count desc)`)
+)
 
 export const theme = (handle: string) =>
 	client.fetch<(ThemeSummary & { pieces: Piece[] }) | null>(

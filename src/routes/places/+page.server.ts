@@ -2,7 +2,7 @@ import { feature, mesh } from 'topojson-client'
 import type { GeometryCollection, Topology } from 'topojson-specification'
 import atlas from 'world-atlas/countries-110m.json'
 import { plot } from '#lib/content/places.ts'
-import { spots } from '#lib/server/content.ts'
+import { frames, spots } from '#lib/server/content.ts'
 import type { PageServerLoad } from './$types'
 
 const FRAME = { width: 1200, height: 620, pad: 20 }
@@ -19,8 +19,11 @@ const world = {
 }
 
 export const load: PageServerLoad = async () => {
-	const { dots, land, borders } = plot(await spots(), FRAME, world)
+	const [found, rows] = await Promise.all([spots(), frames()])
+	const { dots, land, borders } = plot(found, FRAME, world)
 	return {
+		// a shared link to the map shows her latest photograph (the board itself is drawn, not a file)
+		cover: rows.at(-1)?.image ?? null,
 		frame: FRAME,
 		dots,
 		land,
