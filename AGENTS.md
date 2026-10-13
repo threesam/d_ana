@@ -156,6 +156,18 @@ desktop. Keep it there:
   and places, and 98 on home and on 2018. What is left: a type face that lands before
   the first paint is counted against it (home), and the faces arriving after it lay the
   longest year out a second time (2018). Both are about how the faces load.
+- **The live site, 2026-10-13** (the day it shipped). Google's PageSpeed Insights, which
+  runs Lighthouse on Google's own machines: 100 in all four categories on home, 2018 and
+  2024, phone and desktop; a theme and places read 99 for performance on a phone and 100
+  everywhere else. From this laptop on a busy day: desktop 99 to 100, phone 95 to 100
+  (2018 the lowest), and accessibility, best practices and SEO 100 on every run.
+- **Measure the live site with `?test` on the address** (`https://d-ana.com/2018?test`).
+  Lighthouse's Chrome carries an ordinary browser's name, so without it every run is
+  stored as a visit. pagespeed.web.dev takes the same address (its API refuses without a
+  key), and it is the reading to trust when the laptop is busy.
+- **Repeat a low reading before believing it.** Two phone runs on launch day read 66 and
+  69: Chrome's main thread froze for two to four seconds on one task that belongs to
+  nothing on the page. Six repeats and Google's own runs did not show it.
 
 ## Counting
 
@@ -181,13 +193,22 @@ is counted and why it is built this way. The rules that bite:
 
 ## Content changes and deploys
 
-The Sanity project has a webhook named `Vercel` that calls a Vercel deploy hook to
-rebuild `main`. It is **switched off** (2026-10-12): it fired once for every document in
-every dataset, so the archive import asked for a production build per document, every
-one failed against the old `main`, and the account's daily allowance of 100 deployments
-went with them: Vercel refused every preview here and on the Studio until the webhook
-was switched off twelve hours later. Before a bulk write to Sanity, check it is still
-off. When it goes back on it should watch the `production` dataset only.
+The Sanity project has a webhook named `Vercel` that calls a Vercel deploy hook (named
+`Sanity`) to rebuild `main`. Since the rebuild shipped (2026-10-13) it is **on, for the
+`production` dataset only**: publish a change there and the live site rebuilds itself.
+The private `landing` dataset rebuilds nothing, and neither does a draft.
+
+**It fires once for every document, so switch it off before a bulk write to
+`production`** and back on after:
+`PATCH https://<projectId>.api.sanity.io/v2021-10-04/hooks/<id>` with
+`{"isDisabledByUser": true}` (`pnpm exec sanity hook list` in the Studio folder gives the
+id). Switching it off cancels what is queued, so nothing replays; ask Vercel for one
+rebuild when the write is done. Its address is a secret: never print it.
+
+Why the rule: on 2026-10-11 it still watched every dataset, the archive import asked
+for a production build per document, every one failed against the old `main`, and the
+account's daily allowance of 100 deployments went with them. Vercel refused every
+preview here and on the Studio until the webhook was switched off twelve hours later.
 
 ## Conventions
 

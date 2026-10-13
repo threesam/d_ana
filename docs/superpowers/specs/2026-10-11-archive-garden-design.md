@@ -1,6 +1,6 @@
 # d-ana.com: the archive as the ground floor
 
-Date: 2026-10-11. Status: draft for review.
+Date: 2026-10-11. Status: shipped 2026-10-13, live at d-ana.com.
 
 ## What this is
 
@@ -235,6 +235,8 @@ once, with `useCdn: false` so a rebuild always sees what was just changed.
 - A local build meets it. The first measurements on Vercel's own host (2026-10-12, the
   first day a preview could be built) are 100 on desktop and 98 to 100 on a phone. Open:
   how the type faces load, which is what the last two points on a phone turn on.
+- Live (2026-10-13): Google's PageSpeed Insights reads 100 in all four on home and two
+  years, phone and desktop, and 99 for performance on a phone on a theme and on places.
 
 ### Getting around
 
