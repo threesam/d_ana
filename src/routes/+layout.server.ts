@@ -1,28 +1,23 @@
-import type { SiteSettings } from '$lib/types'
-import { client } from '$lib/utils/sanity'
+import { building, dev } from '$app/env'
+import { summarize } from '#lib/content/index.ts'
+import { frames, themes } from '#lib/server/content.ts'
 import type { LayoutServerLoad } from './$types'
 
-// since there's no dynamic data here, we can prerender
-// it so that it gets served as a static asset in production
+// Every page is the same for everyone and nothing on it moves, so the whole site is
+// written to HTML at build time and ships no JavaScript.
 export const prerender = true
+export const csr = false
 
+/** Every year and every theme, for the foot of every page: from there no page is a dead end. */
 export const load: LayoutServerLoad = async () => {
-	const settings = await client.fetch<SiteSettings>(`*[_type == 'siteSettings'][0]{
-		...,
-		founder->{
-			...,
-			image{
-				...,
-				asset->
-			},
-			imageGallery[]{
-				...asset->,
-				alt
-			},
-		}
-	}`)
-
+	// A page that is not there is the one page drawn when it is asked for. It must not ask
+	// Sanity for anything (no visitor ever does), so it goes without the lists.
+	if (!building && !dev) return { index: { years: [], themes: [] } }
+	const [rows, all] = await Promise.all([frames(), themes()])
 	return {
-		settings
+		index: {
+			years: summarize(rows).map((year) => year.year),
+			themes: all.map(({ handle, title }) => ({ handle, title }))
+		}
 	}
 }
