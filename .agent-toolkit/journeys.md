@@ -5,21 +5,24 @@ Run against `pnpm build && pnpm preview` (every route is prerendered from Sanity
 ## home
 
 - go to /
-- expect heading level 1 containing "I'm"
-- expect heading "Thoughts"
+- expect heading level 1 "d-ana"
+- expect a list of years, newest first, each a link
 - expect every image loaded (no broken images)
-- click the hero video's "Pause video" button
-- expect the video paused and the button named "Play video"
-- click "Play video"
-- expect the video playing
 
-## read a thought
+## read a year
 
 - go to /
-- click the first "read more" link
-- expect URL /thoughts/<slug>
-- expect heading level 1 with the post title
-- expect the hero image fully below the fixed header
+- click the first year
+- expect URL /<year>
+- expect heading level 1 with the year
+- expect at least one photograph, and every photograph has a description
+- click the first month link
+- expect the URL to end with #<year>-<month>
+
+## places
+
+- go to /places
+- expect heading level 1 "Places"
 
 ## keyboard
 
@@ -29,12 +32,7 @@ Run against `pnpm build && pnpm preview` (every route is prerendered from Sanity
 - press Enter
 - expect focus inside main
 
-## unknown thought
+## not found
 
-- go to /thoughts/does-not-exist
-- expect status 404 and a page title starting "404"
-
-## mobile
-
-- at 375px wide, go to / and a thought
-- expect no horizontal scroll
+- go to /thoughts/anything
+- expect status 404
