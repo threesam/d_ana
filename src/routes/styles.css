@@ -1,28 +1,127 @@
-@import '@fontsource/fira-mono';
+@import 'tailwindcss';
+@import '@fontsource/poiret-one/400.css';
+@import '@fontsource/spectral/300.css';
+@import '@fontsource/spectral/300-italic.css';
+@import '@fontsource/spectral/400.css';
+@import '@fontsource/ibm-plex-mono/400.css';
 
-@font-face {
-	font-family: 'Montserrat';
-	font-display: swap;
-	src: url('$lib/assets/fonts/Montserrat-VariableFont_wght.ttf'),
-		url('$lib/assets/fonts/Montserrat-Italic-VariableFont_wght.ttf');
+/*
+  One white look on purpose: white ground, black type, and the only colour on a page is
+  whatever her photographs bring. Four values, no accent, no dark theme.
+*/
+@theme {
+	--font-*: initial;
+	/* Poiret One: one weight, no italic, and it carries Cyrillic, so it sets her Russian too. */
+	--font-title: 'Poiret One', 'Century Gothic', 'Avenir Next', system-ui, sans-serif;
+	--font-read: Spectral, Georgia, 'Times New Roman', serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--color-paper: #ffffff;
+	--color-ink: #111111;
+	--color-graphite: #6e6e6b;
+	--color-rule: #e4e4e1;
+	--color-wash: #f3f3f1;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@layer base {
+	:root {
+		--gutter: clamp(16px, 4vw, 48px);
+		--wrap: 1320px;
+		/* how far a photograph travels to run off the edge of the screen */
+		--bleed: calc(var(--gutter) + max(0px, (100vw - var(--wrap)) / 2));
+		color-scheme: light;
+	}
 
-:root {
-	--font-body: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-	--font-mono: 'Fira Mono', monospace;
-	--color-bg-0: rgb(202, 216, 228);
-	--color-bg-1: hsl(209, 36%, 86%);
-	--color-bg-2: hsl(224, 44%, 95%);
-	--color-theme-1: #ff3e00;
-	--color-theme-2: #4075a6;
-	--color-text: rgba(0, 0, 0, 0.7);
-	--column-width: 42rem;
-	--column-margin-top: 4rem;
-	font-family: var(--font-body);
-	color: var(--color-text);
+	html {
+		background: var(--color-paper);
+		color: var(--color-ink);
+	}
+
+	/* a jump to a month glides there */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
+	body {
+		font: 300 18px/1.62 var(--font-read);
+		/* a bled photograph may reach under a classic scrollbar; never let that scroll the page */
+		overflow-x: clip;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-title);
+		font-weight: 400;
+		text-wrap: balance;
+	}
+
+	a {
+		text-decoration-line: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+
+	a:hover {
+		text-decoration-thickness: 2px;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-ink);
+		outline-offset: 3px;
+	}
+
+	img {
+		height: auto;
+	}
+}
+
+@layer components {
+	.wrap {
+		max-width: var(--wrap);
+		margin-inline: auto;
+		padding-inline: var(--gutter);
+	}
+
+	.mono {
+		font: 400 12px/1.5 var(--font-mono);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.muted {
+		color: var(--color-graphite);
+	}
+
+	/* The title page: the words sit alone, low on an otherwise empty first screen. */
+	.title-page {
+		padding-top: clamp(96px, 30svh, 320px);
+		padding-bottom: clamp(40px, 8svh, 96px);
+	}
+
+	.title-page h1 {
+		font-size: clamp(64px, 15vw, 208px);
+		line-height: 0.92;
+		letter-spacing: -0.01em;
+	}
+
+	.title-page .lede {
+		margin-top: 20px;
+		max-width: 44ch;
+		font-size: 20px;
+	}
+
+	/* On a phone a year or a theme opens on its title alone, filling the first screen under
+	   the masthead (74px), and the first photograph starts on the next. The first screen is
+	   then complete the moment the page arrives, with nothing in it still to be fetched. */
+	@media (max-width: 859px) {
+		.title-page.alone {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			min-height: calc(100svh - 74px);
+		}
+	}
 }
