@@ -4,9 +4,275 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
+		<!-- every photograph and video comes from here: open the connection before the first is asked for -->
+		<link rel="preconnect" href="https://cdn.sanity.io" />
+		<!-- not a script: tells Chrome to get a page ready when a link to it is hovered or pressed,
+		     so moving between years is instant. Other browsers ignore it. -->
+		<script type="speculationrules">
+			{ "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }] }
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
+		<!-- The site's own script, in three parts. The only other script is the visitor count
+		     (umami, from Sam's server), which this one fetches once the page is up.
+
+		     Counting: what a reader does is told to umami by name. A click on a link is named for
+		     where the link goes. What asks to be counted when it is read (`data-seen`) is counted
+		     once it has stayed on screen. Nothing here waits for the tracker or the server.
+
+		     Videos: one plays while it is on screen and stops when it leaves. A tap, Enter or Space
+		     stops one, and it then stays stopped until she starts it again. Someone who asked for
+		     less motion, or to save data, starts each one themselves.
+
+		     Months (a year page): the row of month names sticks to the top of the screen and
+		     follows the page. The month being read stands where its heading would. The next one
+		     draws nearer as the page is read down, and arrives as its own section does. The row
+		     is a strip that scrolls sideways, so a swipe along it brings back a month that has
+		     gone by, and a click on a name goes there. -->
+		<script>
+			{
+				// `?test` takes this browser out of the count for good and `?test=0` puts it back:
+				// Sam's rule for every site of his, so that his own visits are never visits. It is
+				// umami's own switch, which the tracker reads before everything it sends.
+				try {
+					const test = new URLSearchParams(location.search).get('test')
+					if (test === '0') localStorage.removeItem('umami.disabled')
+					else if (test !== null) localStorage.setItem('umami.disabled', '1')
+				} catch {
+					// (a browser that keeps nothing has nothing to remember)
+				}
+				// Anything said before the tracker is here waits for it.
+				const early = []
+				const say = (name, data) =>
+					window.umami ? umami.track(name, data) : early.push([name, data])
+
+				// A click on any link is counted, named for where the link goes: out of the site
+				// (`follow` from the foot of the page, where her own accounts are, otherwise `out`),
+				// to a month on this page, to a year, or to the page it names. `via` is the part of
+				// the page the link is in (`data-via` on whatever holds it).
+				// It is counted from here, not by the tracker's own `data-umami-event`: that holds a
+				// click until the tracker's request has come back, so a slow server would hold the site.
+				const named = (link, via) => {
+					if (link.host !== location.host) return via === 'foot' ? 'follow' : 'out'
+					if (link.pathname === location.pathname && link.hash)
+						return /^#\d{4}-\d\d$/.test(link.hash) ? 'month' : 'jump'
+					if (/^\/\d{4}$/.test(link.pathname)) return 'year'
+					return link.pathname.split('/')[1] || 'home'
+				}
+				addEventListener('click', (e) => {
+					const link = e.target.closest('a[href]')
+					if (!link) return
+					const via = link.closest('[data-via]')?.dataset.via ?? 'page'
+					const to =
+						link.host === location.host
+							? link.pathname + link.hash
+							: link.hostname.replace(/^www\./, '') + link.pathname.replace(/\/$/, '')
+					say(named(link, via), { to, via })
+				})
+
+				const calm =
+					matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData
+				const play = (video) => {
+					video.muted = true
+					video.play().catch(() => {})
+				}
+				// `held`: stopped by hand, so coming back on screen does not start it again
+				const toggle = (video) => {
+					say('video', {
+						do: video.paused ? 'start' : 'stop',
+						in: video.closest('section[id]')?.id
+					})
+					if (video.paused) {
+						delete video.dataset.held
+						play(video)
+					} else {
+						video.dataset.held = ''
+						video.pause()
+					}
+				}
+				// A video starts once it has stayed on screen for a moment, so a fast scroll down a year
+				// of them does not start (and download) every one it passes.
+				const waiting = new WeakMap()
+				const seen = new IntersectionObserver((entries) => {
+					for (const { target, isIntersecting } of entries) {
+						clearTimeout(waiting.get(target))
+						if (!isIntersecting) target.pause()
+						else if (!calm && !('held' in target.dataset))
+							waiting.set(
+								target,
+								setTimeout(() => play(target), 250)
+							)
+					}
+				})
+				for (const video of document.querySelectorAll('video')) seen.observe(video)
+				addEventListener('click', (e) => e.target instanceof HTMLVideoElement && toggle(e.target))
+				addEventListener('keydown', (e) => {
+					if (!(e.target instanceof HTMLVideoElement) || (e.key !== 'Enter' && e.key !== ' '))
+						return
+					e.preventDefault()
+					toggle(e.target)
+				})
+
+				const run = document.querySelector('.run')
+				if (run) {
+					// the row: a strip of names that scrolls sideways, moved from here as the page moves
+					// and by the reader's own hand when they want a month that has gone by
+					const pane = run.querySelector('.window')
+					const track = pane.firstElementChild
+					const names = [...track.children]
+					const months = [...run.querySelectorAll('section')]
+					// where each name starts along the row, how wide it is, and how wide the column is
+					let starts, widths, column
+					const measure = () => {
+						const margin = parseFloat(getComputedStyle(track).paddingLeft)
+						starts = names.map((name) => name.offsetLeft - names[0].offsetLeft)
+						widths = names.map((name) => name.offsetWidth)
+						column = pane.clientWidth - 2 * margin
+						// room after the last name, so that it too can stand at the left of the column
+						track.style.paddingRight = `${pane.clientWidth - margin - widths.at(-1) + 1}px`
+						place()
+					}
+					// a name is as solid as the share of it that is inside the column
+					const fade = (x) =>
+						names.forEach((name, n) => {
+							const from = starts[n] - x
+							const inside = Math.min(from + widths[n], column) - Math.max(from, 0)
+							name.firstElementChild.style.opacity = Math.max(0, Math.min(inside / widths[n], 1))
+						})
+					let queued = 0
+					// where this script last put the row, and when the reader last moved it themselves
+					let put = 0
+					let swiped = -Infinity
+					// the month a click is on its way to: the row goes straight there and is left alone
+					// until the page has arrived too
+					let hop = -1
+					const arrived = () => {
+						const top = months[hop].getBoundingClientRect().top
+						// (the page is there by the same measure `place` uses, or the name would lose its
+						// ink for the last frames of the way)
+						if (top <= 0.5 && top > -1 && Math.abs(pane.scrollLeft - starts[hop]) < 2) hop = -1
+					}
+					const place = () => {
+						queued = 0
+						if (hop >= 0) arrived()
+						const tops = months.map((month) => month.getBoundingClientRect().top)
+						// the month whose top has reached the top of the screen; none yet means the row is at rest
+						const reached = tops.findLastIndex((top) => top <= 0.5)
+						const now = hop < 0 ? Math.max(reached, 0) : hop
+						run.classList.toggle('stuck', reached >= 0)
+						names.forEach((name, n) => name.classList.toggle('now', n === now))
+						// On its way to a click, or just swiped by the reader, the row is not this page's to
+						// move (at rest it always is: the one name showing is the first month's heading).
+						// ponytail: after a swipe it goes back to the page's month at once, the next time
+						// the page moves. Ease it back if that reads as a jump.
+						if (hop >= 0 || (reached >= 0 && performance.now() - swiped < 800)) return
+						const next = Math.min(now + 1, names.length - 1)
+						// how far through this month the page is: 0 at its top, 1 where the next begins
+						const through =
+							reached < 0 || next === now ? 0 : Math.min(-tops[now] / (tops[next] - tops[now]), 1)
+						// The row moves all the way down the month, slowly at first and quickest at the end,
+						// so the name of the month being read stays readable for most of it.
+						// (to a whole pixel: Safari drops the fraction of a scroll position, others round it)
+						put = Math.round(starts[now] + through ** 3 * (starts[next] - starts[now]))
+						pane.scrollLeft = put
+						fade(put)
+					}
+					// A click on a month's name: the row slides straight to it, and the page glides there
+					// (CSS). From far off, a glide would fetch every photograph it passes (three megabytes
+					// across a year), so from further than `far` screens the page first cuts to one screen
+					// short of the month and glides the rest.
+					// ponytail: a dozen screens is about half a megabyte of photographs; this is the knob
+					const far = 12
+					let landing
+					if (calm) document.documentElement.style.scrollBehavior = 'auto'
+					addEventListener('click', (e) => {
+						const link = e.target.closest('a[href^="#"]')
+						const to = link ? months.findIndex((month) => '#' + month.id === link.hash) : -1
+						// (with a key held the link opens somewhere else, and this page stays where it is)
+						if (to < 0 || e.metaKey || e.ctrlKey || e.shiftKey) return
+						hop = to
+						put = starts[to]
+						pane.scrollTo({ left: put, behavior: calm ? 'instant' : 'smooth' })
+						clearTimeout(landing)
+						// if the page never gets there (the reader took over), the row follows the page again
+						landing = setTimeout(() => {
+							hop = -1
+							place()
+						}, 2000)
+						const top = months[to].getBoundingClientRect().top
+						if (!calm && Math.abs(top) > far * innerHeight)
+							scrollBy({ top: top - Math.sign(top) * innerHeight, behavior: 'instant' })
+						// the name takes its ink now, not when the page first moves
+						place()
+					})
+					run.classList.add('live')
+					addEventListener('scroll', () => (queued ||= requestAnimationFrame(place)), {
+						passive: true
+					})
+					// The row has moved. If this script did not put it there, the reader did.
+					pane.addEventListener(
+						'scroll',
+						() => {
+							if (hop >= 0) arrived()
+							else if (Math.abs(pane.scrollLeft - put) > 2) {
+								// (the first swipe on a page is the one counted)
+								if (swiped === -Infinity) say('swipe')
+								swiped = performance.now()
+							}
+							fade(pane.scrollLeft)
+						},
+						{ passive: true }
+					)
+					addEventListener('resize', measure)
+					// the names change width when the title face arrives
+					document.fonts.ready.then(measure)
+					measure()
+				}
+
+				// The count starts once the page is up and, in Chrome, really being looked at: a page
+				// made ready behind a hovered link (the speculation rules in the head) is not a visit
+				// until it is opened. The tracker is umami from Sam's own server: no cookie, nothing
+				// kept in the browser. It counts the page and how fast it drew; the rest is said above.
+				const count = () => {
+					const tracker = document.createElement('script')
+					tracker.src = 'https://analytics.sixtom.com/script.js'
+					tracker.dataset.websiteId = 'cdd11c24-c689-4580-90a8-17bd8f1a374f'
+					// (only on the real site: a preview or a laptop fetches it and it stays silent)
+					tracker.dataset.domains = 'd-ana.com'
+					tracker.dataset.performance = 'true'
+					tracker.onload = () => {
+						for (const [name, data] of early.splice(0)) umami.track(name, data)
+					}
+					document.head.append(tracker)
+
+					// What asks to be counted when it is read (`data-seen`: a month, the foot of a page,
+					// a page that is not there) is counted once it has stayed on screen for two seconds,
+					// so a month the page only glides past is not one that was read.
+					// ponytail: one wait for everything; give months their own if two seconds proves wrong
+					const lingering = new WeakMap()
+					const noticed = new IntersectionObserver((entries) => {
+						for (const { target, isIntersecting } of entries) {
+							clearTimeout(lingering.get(target))
+							if (isIntersecting)
+								lingering.set(
+									target,
+									setTimeout(() => {
+										noticed.unobserve(target)
+										say(target.dataset.seen, target.id ? { id: target.id } : undefined)
+									}, 2000)
+								)
+						}
+					})
+					for (const part of document.querySelectorAll('[data-seen]')) noticed.observe(part)
+				}
+				addEventListener('load', () => {
+					if (document.prerendering)
+						document.addEventListener('prerenderingchange', count, { once: true })
+					else count()
+				})
+			}
+		</script>
 	</body>
 </html>
