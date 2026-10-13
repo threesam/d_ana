@@ -1,126 +1,127 @@
 @import 'tailwindcss';
+@import '@fontsource/poiret-one/400.css';
+@import '@fontsource/spectral/300.css';
+@import '@fontsource/spectral/300-italic.css';
+@import '@fontsource/spectral/400.css';
+@import '@fontsource/ibm-plex-mono/400.css';
 
 /*
-  Tailwind v3 parity (the v4 upgrade is meant to render identically):
-  - v4 gates `hover:` behind (hover: hover); v3 applied it on tap too, which is
-    how the hero play/pause overlay shows on touch devices.
-  - v4 palette moved to oklch; pin the few palette colors in use to v3's hex.
+  One white look on purpose: white ground, black type, and the only colour on a page is
+  whatever her photographs bring. Four values, no accent, no dark theme.
 */
-@custom-variant hover (&:hover);
-
 @theme {
 	--font-*: initial;
-	--font-sans: Montserrat, sans-serif;
-	--font-mono: monospace;
+	/* Poiret One: one weight, no italic, and it carries Cyrillic, so it sets her Russian too. */
+	--font-title: 'Poiret One', 'Century Gothic', 'Avenir Next', system-ui, sans-serif;
+	--font-read: Spectral, Georgia, 'Times New Roman', serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-	--list-style-type-*: initial;
-	--list-style-type-none: none;
-	--list-style-type-disc: disc;
-	--list-style-type-decimal: decimal;
-	--list-style-type-square: square;
-	--list-style-type-roman: upper-roman;
-
-	--background-image-gradient-fade: linear-gradient(180deg, #000, transparent);
-	--background-image-gradient-3:
-		radial-gradient(circle at top left, rgba(19, 19, 19, 0.55), transparent 80%),
-		radial-gradient(circle at top right, rgba(33, 48, 25, 0.75), transparent 100%),
-		radial-gradient(at bottom left, rgba(33, 48, 25, 0.75), transparent 100%),
-		radial-gradient(at bottom right, rgba(19, 19, 19, 0.55), transparent 80%);
-
-	--color-gray-100: #f3f4f6;
-	--color-gray-200: #e5e7eb;
-	--color-pink-200: #fbcfe8;
-
-	--color-primary: rgb(183, 198, 175);
-	--color-dark: #111111;
-	--color-light: #fafafa;
-}
-
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-	*,
-	::after,
-	::before,
-	::backdrop,
-	::file-selector-button {
-		border-color: var(--color-gray-200, currentcolor);
-	}
-
-	/* v4 preflight dropped the pointer cursor on buttons. */
-	button:not(:disabled),
-	[role='button']:not(:disabled) {
-		cursor: pointer;
-	}
+	--color-paper: #ffffff;
+	--color-ink: #111111;
+	--color-graphite: #6e6e6b;
+	--color-rule: #e4e4e1;
+	--color-wash: #f3f3f1;
 }
 
 @layer base {
-	@font-face {
-		font-family: 'Montserrat';
-		font-display: swap;
-		src:
-			url('$lib/assets/fonts/Montserrat-VariableFont_wght.ttf'),
-			url('$lib/assets/fonts/Montserrat-Italic-VariableFont_wght.ttf');
+	:root {
+		--gutter: clamp(16px, 4vw, 48px);
+		--wrap: 1320px;
+		/* how far a photograph travels to run off the edge of the screen */
+		--bleed: calc(var(--gutter) + max(0px, (100vw - var(--wrap)) / 2));
+		color-scheme: light;
+	}
+
+	html {
+		background: var(--color-paper);
+		color: var(--color-ink);
+	}
+
+	/* a jump to a month glides there */
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
+	body {
+		font: 300 18px/1.62 var(--font-read);
+		/* a bled photograph may reach under a classic scrollbar; never let that scroll the page */
+		overflow-x: clip;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: var(--font-title);
+		font-weight: 400;
+		text-wrap: balance;
+	}
+
+	a {
+		text-decoration-line: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+
+	a:hover {
+		text-decoration-thickness: 2px;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-ink);
+		outline-offset: 3px;
+	}
+
+	img {
+		height: auto;
 	}
 }
 
-:root {
-	--font-body:
-		Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-		'Open Sans', 'Helvetica Neue', sans-serif;
-	--color-text: rgba(0, 0, 0, 0.7);
-	font-family: var(--font-body);
-	color: var(--color-text);
-}
+@layer components {
+	.wrap {
+		max-width: var(--wrap);
+		margin-inline: auto;
+		padding-inline: var(--gutter);
+	}
 
-/* Portable Text body styles (moved from PortableText.svelte's global scss block). */
-.portable-text h1,
-.portable-text h2,
-.portable-text h3,
-.portable-text h4,
-.portable-text h5 {
-	@apply font-semibold uppercase;
-}
+	.mono {
+		font: 400 12px/1.5 var(--font-mono);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
 
-.portable-text h1 {
-	@apply text-4xl;
-}
+	.muted {
+		color: var(--color-graphite);
+	}
 
-.portable-text h2 {
-	@apply text-3xl;
-}
+	/* The title page: the words sit alone, low on an otherwise empty first screen. */
+	.title-page {
+		padding-top: clamp(96px, 30svh, 320px);
+		padding-bottom: clamp(40px, 8svh, 96px);
+	}
 
-.portable-text h3 {
-	@apply text-2xl;
-}
+	.title-page h1 {
+		font-size: clamp(64px, 15vw, 208px);
+		line-height: 0.92;
+		letter-spacing: -0.01em;
+	}
 
-.portable-text h4 {
-	@apply text-xl;
-}
+	.title-page .lede {
+		margin-top: 20px;
+		max-width: 44ch;
+		font-size: 20px;
+	}
 
-.portable-text h5 {
-	@apply text-lg;
-}
-
-.portable-text ul,
-.portable-text p {
-	@apply pb-5;
-}
-
-.portable-text a {
-	@apply border-b-2 border-pink-200 transition-all duration-100;
-}
-
-.portable-text a:hover {
-	@apply border-transparent pb-1 text-pink-200;
-}
-
-.portable-text blockquote {
-	@apply text-dark border-2 border-black bg-pink-200 p-5 text-sm sm:p-10 md:text-lg;
+	/* On a phone a year or a theme opens on its title alone, filling the first screen under
+	   the masthead (74px), and the first photograph starts on the next. The first screen is
+	   then complete the moment the page arrives, with nothing in it still to be fetched. */
+	@media (max-width: 859px) {
+		.title-page.alone {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			min-height: calc(100svh - 74px);
+		}
+	}
 }
