@@ -147,6 +147,12 @@
 
 	.themes {
 		margin-top: clamp(72px, 10vw, 144px);
+		/* Drawn when a reader nears it, as the foot is. One theme has a Russian title, and drawing
+		   the list with the page had every visit fetch the title face's Cyrillic file before the
+		   first paint, which Google's phone reading counts against the largest paint. Only the
+		   foot stands under it, so a jump to #themes still lands where it should. */
+		content-visibility: auto;
+		contain-intrinsic-block-size: auto 360px;
 	}
 	.themes h2 {
 		font-size: clamp(32px, 4vw, 44px);
