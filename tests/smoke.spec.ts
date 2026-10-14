@@ -221,13 +221,19 @@ test('a month that has gone by comes back with a swipe along the row', async ({ 
 
 test('the type faces load and nothing the page asks for is missing', async ({ page }) => {
 	const missing: string[] = []
+	const faces: string[] = []
 	page.on('response', (response) => {
 		if (response.status() >= 400) missing.push(response.url())
+	})
+	page.on('request', (request) => {
+		if (request.resourceType() === 'font') faces.push(request.url())
 	})
 	await page.goto('/')
 	await page.evaluate(() => document.fonts.ready)
 
 	expect(missing).toEqual([])
+	// the title face is written into the page (vite.config.ts), so it is never fetched
+	expect(faces.filter((face) => face.includes('poiret-one-latin-400'))).toEqual([])
 	const loaded = await page.evaluate(() =>
 		[...document.fonts].filter((face) => face.status === 'loaded').map((face) => face.family)
 	)

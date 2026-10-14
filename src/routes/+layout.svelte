@@ -1,5 +1,4 @@
 <script lang="ts">
-	import titleFace from '@fontsource/poiret-one/files/poiret-one-latin-400-normal.woff2?url'
 	import { page } from '$app/state'
 	import type { LayoutProps } from './$types'
 	import './styles.css'
@@ -9,11 +8,6 @@
 	// the page a reader is on is marked in the lists at the foot
 	const here = (path: string) => (page.url.pathname === path ? 'page' : undefined)
 </script>
-
-<svelte:head>
-	<!-- the title face is the first thing drawn on every page: fetch it with the page -->
-	<link rel="preload" href={titleFace} as="font" type="font/woff2" crossorigin="anonymous" />
-</svelte:head>
 
 <a class="skip mono" href="#main">Skip to content</a>
 
