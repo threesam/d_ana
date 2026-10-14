@@ -227,7 +227,8 @@ once, with `useCdn: false` so a rebuild always sees what was just changed.
 - All CSS (about 20 KB) is written into each page, so nothing blocks the first paint.
   `src/hooks.server.ts` corrects the font addresses SvelteKit 3.0.1 leaves wrong in it.
 - The page connects to the image CDN before the first photograph is asked for. The
-  title face is written into the CSS, so it is there for the first paint.
+  three faces a first screen uses are written into the CSS, so the first paint is drawn
+  in them and nothing is swapped after it.
 - A video downloads nothing until it plays, and waits a quarter second on screen first.
 - In Chrome, hovering or pressing a link gets the next page ready (speculation rules).
 - Lighthouse, phone and desktop, on home, two years, a theme and places: 100 in all

@@ -232,8 +232,10 @@ test('the type faces load and nothing the page asks for is missing', async ({ pa
 	await page.evaluate(() => document.fonts.ready)
 
 	expect(missing).toEqual([])
-	// the title face is written into the page (vite.config.ts), so it is never fetched
-	expect(faces.filter((face) => face.includes('poiret-one-latin-400'))).toEqual([])
+	// the faces a first screen uses are written into the page (vite.config.ts): never fetched
+	expect(
+		faces.filter((face) => /(poiret-one|spectral|ibm-plex-mono)-latin-(300|400)-normal/.test(face))
+	).toEqual([])
 	const loaded = await page.evaluate(() =>
 		[...document.fonts].filter((face) => face.status === 'loaded').map((face) => face.family)
 	)

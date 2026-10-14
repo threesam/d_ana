@@ -133,11 +133,13 @@ desktop. Keep it there:
   repairs the font addresses SvelteKit 3.0.1 leaves relative in the inlined CSS when
   there is no client build. Delete the hook once SvelteKit does it; the smoke test
   "the type faces load" tells you when that is safe (it fails if a face 404s).
-- **The title face is inside the CSS** (`assetsInlineLimit` in `vite.config.ts`, 8 KB).
-  As a file it raced the first paint: when it lost, a phone's largest paint (a title)
-  was counted only once the face arrived, and Google read 99 instead of 100. The smoke
-  test fails if it is ever fetched as a file again (a `@fontsource` upgrade can rename
-  it). Keep the other faces as files: they are bigger and no first screen waits on them.
+- **The three first-screen faces are inside the CSS** (`assetsInlineLimit` in
+  `vite.config.ts`): the title face, the reading face at 300 and the date face, latin
+  only, 45 KB. As files they raced the first paint. A phone's largest paint (a title)
+  was counted only once its face arrived, and the reading and date faces arriving after
+  the paint laid a whole year out again. Google read 98 or 99 instead of 100 for either.
+  The smoke test fails if one is ever fetched as a file (a `@fontsource` upgrade can
+  rename them). Italics, 400 and other alphabets stay files: no first screen needs them.
 - **`sizes()` in `content/image.ts` mirrors the grid in `Blocks.svelte`** and the
   thumbnail height in `routes/+page.svelte`. Change a column or a height cap in one
   and you must change the other, or browsers fetch the wrong file.
