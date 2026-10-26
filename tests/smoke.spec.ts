@@ -221,13 +221,20 @@ test('a month that has gone by comes back with a swipe along the row', async ({ 
 
 test('the type faces load and nothing the page asks for is missing', async ({ page }) => {
 	const missing: string[] = []
+	const faces: string[] = []
 	page.on('response', (response) => {
 		if (response.status() >= 400) missing.push(response.url())
+	})
+	page.on('request', (request) => {
+		if (request.resourceType() === 'font') faces.push(request.url())
 	})
 	await page.goto('/')
 	await page.evaluate(() => document.fonts.ready)
 
 	expect(missing).toEqual([])
+	// The faces a first screen uses are written into the page (vite.config.ts), and nothing on
+	// the home page that needs another face is drawn before a reader nears it: no face is fetched.
+	expect(faces).toEqual([])
 	const loaded = await page.evaluate(() =>
 		[...document.fonts].filter((face) => face.status === 'loaded').map((face) => face.family)
 	)
